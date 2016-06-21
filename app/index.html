@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>My website</title>
+  <link rel="stylesheet" href="css/style.css" type="text/css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="row row-top">
+
+      <section id="heat" class="col-md-10">
+        <div id="placeholder">
+          heat here
+        </div>
+      </section>
+
+      <form id="controls" class="col-md-2">
+
+        <h4>Flights</h4>
+
+        <div class="row">
+          <div class='col-md-8 col-left'>
+            <label class="control-label" for="startDate">Start</label>
+            <input type="text" class="form-control input-sm date datepicker" id="startDate" name="startDate">
+          </div>
+          <div class='col-md-4 col-right'>
+            <label class="control-label" for="numDays">Days</label>
+            <input class="form-control input-sm" type="text" name="numDays" id="numDays" value="7">
+          </div>
+        </div><!-- row -->
+
+        <div class="check-group">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="arrivals" name="arrivals"> Arr
+          </label>
+          <label class="checkbox-inline">
+            <input type="checkbox" id="departures"> Dep
+          </label>
+        </div>
+
+        <div class="form-group">
+          <select class="selectpicker form-control" data-live-search=true id="airport" name="airport">
+            <option>SEA</option>
+            <option>LAX</option>
+            <option>BRB</option>
+            <option>BZA</option>
+          </select>
+        </div>
+
+        <h4>Carriers</h4>
+
+        <div class="form-group">
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" id="domestic">Domestic</label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" id="international">International</label>
+          </div>
+          <select class="selectpicker form-control" multiple="multiple" data-actions-box=true data-live-search=true data-selected-text-format="count>1" data-none-selected-text="Carriers" name="carrier" id="carrier"></select>
+        </div>
+
+        <div class="form-group">
+          <!-- http://stackoverflow.com/questions/23662150/bootstrap-3-dropdown-select -->
+          <label class="control-label" for="delay">Delay Departures</label>
+          <select id="delay" name="delay" class="selectpicker form-control"></select>
+        </div>
+        <div class="btn-group">
+          <button type="button" class="btn btn-sm btn-primary">Get Data</button>
+        </div>
+
+      </form>
+
+    </div> <!--row-top-->
+
+    <div class="row row-bottom">
+
+      <section id="flights" class="col-md-12">
+        <div class="panel panel-default">
+          <!-- Default panel contents -->
+          <div class="panel-heading">Flight Data
+          </div>
+          <!-- <div class="panel-body"> -->
+          <!--     <p>...</p>
+-->
+        </div>
+
+
+        <table class="table">
+          <tr>
+            <th>carrier</td>
+              <th>flight</td>
+          </tr>
+          <tr>
+            <td>AA</td>
+            <td>3465</td>
+          </tr>
+          <tr>
+            <td>DL</td>
+            <td>344</td>
+          </tr>
+          <tr>
+            <td>AS</td>
+            <td>2</td>
+          </tr>
+        </table>
+    </div>
+    </section>
+  </div>
+  <!-- row -->
+  </div>
+  <!-- container -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
+  <!-- <script src="./js/carriers.js" type="text/javascript" charset="utf-8"></script>-->
+  <script src="bootstrap-datepicker.js" type="text/javascript" charset="utf-8"></script>
+  <script src="bundle.js" charset="utf-8"></script>
+</body>
+
+</html>
