@@ -2,17 +2,25 @@ $(document).ready(function() {
 
   // require('./lib/bootstrap-datepicker.js');
   // require('bootstrap-select');
+  var icao = require('./services/icao.js');
 
 
 // load carriersel control
 // carriers = carriers module
-  var carriers = require('./services/carriers');
   var carriersel = $('select[name=carrier]');
-  $.each(carriers, function(i, obj) {
+  $.each(icao.carriers, function(i, obj) {
     var name = (obj.id !== "99") ? obj.id + '   ' + obj.name : obj.name;
     carriersel.append(new Option(name, obj.id));
   });
   carriersel.val("99");
+
+//load airports
+  var airport = $('select[name=airport]');
+  $.each(icao.airports, function(i, obj) {
+    var name = obj.id + '   ' + obj.name;
+    airport.append(new Option(name, obj.id));
+  });
+  airport.val("SEA");
 
 // load delay control
   var delays = [
@@ -32,7 +40,7 @@ $(document).ready(function() {
   });
   delay.val("2");
   //use selectpicker on these controls;
-  $('.selectpicker').selectpicker('refresh');
+  // $('.selectpicker').selectpicker('refresh');
 
   //initialize form controls:
 
@@ -59,17 +67,24 @@ $(document).ready(function() {
   $('#delay').val(2);
 
   //temporarily? adjust #heat height to that of #form
-  var formHeight = $('form').height();
-  $('#heat').height(formHeight);
+  var formHeight;
+  setTimeout(function() {
+    formHeight = $('form').height();
+    $('#heat').height(formHeight);
+  }, 50);
+
+  console.log(formHeight);
 
   //TODO refactor form control defaults out of HTML;
 
 
 
-
+  ////Debug
   var elems = $('#controls').find("[id]").each(function() {
     var thisval = ($(this).prop("type") == "checkbox") ? $(this).is(':checked') : $(this).val();
     console.log($(this).prop("id"), thisval);
+
+  ////
 
   });
 

@@ -45,6 +45,7 @@
     "jasmine-core": "^2.4.1",
     "karma": "^0.13.22",
     "stylus": "^0.54.5",
+    "superagent-cli": "^2.1.0",
     "webpack": "^1.13.1",
     "webpack-dev-server": "^1.14.1"
   }
