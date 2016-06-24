@@ -6,16 +6,15 @@ module.exports = {};
 
 
 
-function getFlightData(model) {
 
+
+//PSEUDO CODE
+//for fetching;
+function getFlightData(model) {
+  //startDate, numDays, airport
+  //get all flights where arrival and dep airports = airport
 }
 
+function loadFormData() {
 
-// function getFormData() {
-//   var elems = $('#controls').find("[id]").each(function() {
-//     var thisval = ($(this).prop("type") == "checkbox") ? $(this).is(':checked') : $(this).val();
-//     model.$(this).prop("id"): thisval);
-//    };
-// }
-
-
+}

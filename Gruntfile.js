@@ -71,11 +71,11 @@ module.exports = function(grunt) {
 
     watch: {
       stylus: {
-        files: ['./app/css/**/*'],
+        files: ['app/css/**/*'],
         tasks: ['stylus:compile']
       },
       client: {
-        files: ['./app/**/*.js', './app/**/*.html'],
+        files: ['app/**/*.js', 'app/**/*.html'],
         tasks: ['build']
       }
     },

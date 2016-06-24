@@ -1,7 +1,7 @@
 'use strict';
 
 var pg = require('pg');
-var db = require('../config.js').db;
+var db = require('../config.js').db; //TODO split this out server/client
 
 module.exports = function(req, res) {
 
@@ -23,7 +23,7 @@ module.exports = function(req, res) {
         // SQL Query > Select Data
         //
         var sql = {
-      text: 'SELECT * FROM depflts($1,$2,$3)',
+      text: 'SELECT * FROM allflts($1,$2,$3)',
       values: [start, days, airport]
     };
 

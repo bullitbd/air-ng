@@ -28,7 +28,7 @@
           </div>
           <div class='col-md-4 col-right'>
             <label class="control-label" for="numDays">Days</label>
-            <input class="form-control input-sm" type="text" name="numDays" id="numDays" value="7">
+            <input class="form-control input-sm" type="text" name="numDays" id="numDays">
           </div>
         </div><!-- row -->
 
@@ -37,7 +37,7 @@
             <input type="checkbox" id="arrivals" name="arrivals"> Arr
           </label>
           <label class="checkbox-inline">
-            <input type="checkbox" id="departures"> Dep
+            <input type="checkbox" id="departures" name="departures"> Dep
           </label>
         </div>
 
@@ -51,11 +51,11 @@
         <div class="form-group">
           <div class="checkbox">
             <label>
-              <input type="checkbox" id="domestic">Domestic</label>
+              <input type="checkbox" id="domestic" name="domestic">Domestic</label>
           </div>
           <div class="checkbox">
             <label>
-              <input type="checkbox" id="international">International</label>
+              <input type="checkbox" id="international" name="international">International</label>
           </div>
           <select class="selectpicker form-control" multiple="multiple" data-actions-box=true data-live-search=true data-selected-text-format="count>1" data-none-selected-text="Carriers" name="carrier" id="carrier"></select>
         </div>
