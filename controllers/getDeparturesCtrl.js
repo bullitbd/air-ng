@@ -1,4 +1,5 @@
 'use strict';
+//getDeparturesCtrl.js
 
 var pg = require('pg');
 var db = require('../config.js').db;

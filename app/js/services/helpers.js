@@ -1,27 +1,26 @@
 'use strict';
 
-var url = 'localhost:3000/flights/all';
 var model = {};
 
 module.exports = {
 
-  getFlights: function getFlightData(q) { //q is data object
-    //var query = '/?'+q.start+'&'+q.days+'&'+q.airport;
-    $.get(url, q, function(data) {
-      return data;
-    });
-  },
+  // getAllFlights: function getFlightData(q) { //q is data object
+  //   var url = 'localhost:3000/flights/all';
+  //   $.getJSON(url, q, function(data) {
+  //     return data;
+  //   });
+  // },
 
-  getForm: function getFormData($form) {
-    var key, val;
-    model = {};
-    $form.find("[id]").each(function() {
-      key = $(this).prop("id");
-      val = ($(this).prop("type") == "checkbox") ? $(this).is(':checked') : $(this).val();
-      model[key] = val;
-    });
-    console.log(model);
-  },
+  // getForm: function getFormData($form) {
+  //   var key, val;
+  //   model = {};
+  //   $form.find("[id]").each(function() {
+  //     key = $(this).prop("id");
+  //     val = ($(this).prop("type") == "checkbox") ? $(this).is(':checked') : $(this).val();
+  //     model[key] = val;
+  //   });
+  //   return model;
+  // },
 
 };
 

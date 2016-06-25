@@ -2,6 +2,8 @@
 
 module.exports = {
 
+    days: 2,
+
     airport: 'LAX',
 
     delays: [

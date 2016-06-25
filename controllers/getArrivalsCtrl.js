@@ -23,7 +23,7 @@ module.exports = function(req, res) {
         // SQL Query > Select Data
         //
         var sql = {
-      text: 'SELECT * FROM depflts($1,$2,$3)',
+      text: 'SELECT * FROM arrflts($1,$2,$3)',
       values: [start, days, airport]
     };
 

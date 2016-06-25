@@ -6,6 +6,13 @@ var model = require('./services/model.js');
 
 $(document).ready(function() {
 
+  var formHeight;
+  setTimeout(function() {
+    formHeight = $('form').height();
+    $('#heat').height(formHeight);
+    // console.log(formHeight);
+  }, 20);
+
 // load carriersel control
 // carriers = carriers module
   var carriersel = $('select[name=carrier]');
@@ -51,8 +58,7 @@ $(document).ready(function() {
 
   //init other controls
 
-
-  $('#numDays').val(7);
+  $('#numDays').val(config.days);
   $('#airport').val(config.airport);
   $('#arrivals').prop('checked', false);
   $('#departures').prop('checked', true);
@@ -62,24 +68,39 @@ $(document).ready(function() {
   $('#delay').val(2);
 
 
-  //temporarily? adjust #heat height to that of #form
-  var formHeight;
-  setTimeout(function() {
-    formHeight = $('form').height();
-    $('#heat').height(formHeight);
-    // console.log(formHeight);
-  }, 1);
+    //get form data and then GET flight data based on those choices;
+  getFormData($('#controls'), getFlightData);
 
-  //helpers.getForm($('#controls'));
+  function getFormData($form, callback) {
+    var key, val;
+    model = {};
+    $form.find("[id]").each(function() {
+      key = $(this).prop("id");
+      val = ($(this).prop("type") == "checkbox") ? $(this).is(':checked') : $(this).val();
+      model[key] = val;
+    });
 
+    callback(model);
+  }
 
+  function getFlightData(model) { //q is data object
+            console.log(model);
 
+    var q = {q:model.startDate,d:model.numDays,a:model.airport};
+    var url = 'http://localhost:3000/flights/all';
+    console.log(q, url);
 
-  ////Debug
-  // var elems = $('#controls').find("[id]").each(function() {
-  //   var thisval = ($(this).prop("type") == "checkbox") ? $(this).is(':checked') : $(this).val();
-  //   console.log($(this).prop("id"), thisval);
-
-  ////
-
-  });
+    $.ajax({
+      url: url,
+      data: q,
+      dataType: "json",
+      success: function(data) {
+      $('#placeholder').val(data);
+      console.log('data : ', data);
+      },
+      error: function (request, status, error) {
+      console.log(request.body, status, request.status, request.responseText);
+      }
+    });
+  }
+});

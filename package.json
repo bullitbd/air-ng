@@ -44,6 +44,7 @@
     "html-minifier": "^2.1.3",
     "jasmine-core": "^2.4.1",
     "karma": "^0.13.22",
+    "morgan": "^1.7.0",
     "stylus": "^0.54.5",
     "superagent-cli": "^2.1.0",
     "webpack": "^1.13.1",
