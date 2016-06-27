@@ -4,6 +4,8 @@
 <head>
   <meta charset="utf-8">
   <title>My website</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="css/style.css" type="text/css">
 </head>
 
@@ -30,7 +32,8 @@
             <label class="control-label" for="numDays">Days</label>
             <input class="form-control input-sm" type="text" name="numDays" id="numDays">
           </div>
-        </div><!-- row -->
+        </div>
+        <!-- row -->
 
         <div class="check-group">
           <label class="checkbox-inline">
@@ -71,7 +74,8 @@
 
       </form>
 
-    </div> <!--row-top-->
+    </div>
+    <!--row-top-->
 
     <div class="row row-bottom">
 
@@ -83,38 +87,20 @@
           <!-- <div class="panel-body"> -->
           <!--     <p>...</p>
 -->
+          <!-- </div> -->
+
+          <div class="tablediv">
+            <table class="table table-striped table-bordered" id="flightTable">
+
+            </table>
+          </div>
         </div>
-
-
-        <table class="table">
-          <tr>
-            <th>carrier</td>
-              <th>flight</td>
-          </tr>
-          <tr>
-            <td>AA</td>
-            <td>3465</td>
-          </tr>
-          <tr>
-            <td>DL</td>
-            <td>344</td>
-          </tr>
-          <tr>
-            <td>AS</td>
-            <td>2</td>
-          </tr>
-        </table>
+      </section>
     </div>
-    </section>
-  </div>
-  <!-- row -->
+    <!-- row -->
   </div>
   <!-- container -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script> -->
-  <!-- <script src="./js/carriers.js" type="text/javascript" charset="utf-8"></script>-->
-  <!-- <script src="bootstrap-datepicker.js" type="text/javascript" charset="utf-8"></script> -->
+
   <script src="bundle.js" charset="utf-8"></script>
 </body>
 

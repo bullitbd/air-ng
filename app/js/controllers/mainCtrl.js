@@ -1,20 +1,5 @@
 'use strict';
 
-var model = {};
-
-module.exports = {};
+module.exports = console.log('flightdata: ',flightdata[0].acity);
 
 
-
-
-
-//PSEUDO CODE
-//for fetching;
-function getFlightData(model) {
-  //startDate, numDays, airport
-  //get all flights where arrival and dep airports = airport
-}
-
-function loadFormData() {
-
-}

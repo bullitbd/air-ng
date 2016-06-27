@@ -2,6 +2,7 @@
 
 var pg = require('pg');
 var db = require('../config.js').db; //TODO split this out server/client
+var moment = require('moment');
 
 module.exports = function(req, res) {
 
@@ -23,15 +24,18 @@ module.exports = function(req, res) {
         // SQL Query > Select Data
         //
         var sql = {
-      text: 'SELECT * FROM allflts($1,$2,$3)',
+      text: 'SELECT * FROM allflts($1,$2,$3) LIMIT 100',
       values: [start, days, airport]
     };
 
         var query = client.query(sql);
+        var thisdate;
 
         // Stream results back one row at a time
         query.on('row', function(row) {
+          row.ddate = moment(row.ddate).format("YYYY-MM-DD");
             results.push(row);
+            console.log('date: ',row.ddate);
         });
 
         // After all data is returned, close connection and return results
