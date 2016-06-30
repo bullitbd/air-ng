@@ -4,8 +4,8 @@
 <head>
   <meta charset="utf-8">
   <title>My website</title>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="css/style.css" type="text/css">
 </head>
 
@@ -45,7 +45,7 @@
         </div>
 
         <div class="form-group">
-          <select class="selectpicker form-control" data-live-search=true id="airport" name="airport">
+          <select class="form-control" id="airport" name="airport">
           </select>
         </div>
 
@@ -60,13 +60,13 @@
             <label>
               <input type="checkbox" id="international" name="international">International</label>
           </div>
-          <select class="selectpicker form-control" multiple="multiple" data-actions-box=true data-live-search=true data-selected-text-format="count>1" data-none-selected-text="Carriers" name="carrier" id="carrier"></select>
+          <select class="form-control" multiple="multiple" name="carrier" id="carrier"></select>
         </div>
 
         <div class="form-group">
           <!-- http://stackoverflow.com/questions/23662150/bootstrap-3-dropdown-select -->
           <label class="control-label" for="delay">Delay Departures</label>
-          <select id="delay" name="delay" class="selectpicker form-control"></select>
+          <select id="delay" name="delay" class="form-control"></select>
         </div>
         <div class="btn-group">
           <button type="button" class="btn btn-sm btn-primary">Get Data</button>

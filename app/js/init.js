@@ -1,5 +1,6 @@
 var helpers = require('./services/helpers.js');
 var config = require('./services/config.js');
+var df = config.startForm;
 var icao = require('./services/icao.js');
 var model = require('./services/model.js');
 
@@ -12,10 +13,10 @@ module.exports = {
     // carriers = carriers module
     var carriersel = $('select[name=carrier]');
     $.each(icao.carriers, function(i, obj) {
-      var name = (obj.id !== "99") ? obj.id + '   ' + obj.name : obj.name;
+      var name = obj.id + '   ' + obj.name;
       carriersel.append(new Option(name, obj.id));
     });
-    carriersel.val("99");
+    carriersel.multiselect();
 
     //load airports select
     var airport = $('select[name=airport]');
@@ -24,6 +25,7 @@ module.exports = {
       airport.append(new Option(name, obj.id));
     });
     airport.val(config.defAirport);
+
 
     // load delay select
     var delays = config.delays;
@@ -53,18 +55,22 @@ module.exports = {
 
     //init other controls
 
-    $('#numDays').val(config.days);
-    $('#airport').val(config.airport);
-    $('#arrivals').prop('checked', false);
-    $('#departures').prop('checked', true);
-    $('#international').prop('checked', true);
-    $('#domestic').prop('checked', true);
-    $('#carrier').val("99");
-    $('#delay').val(2);
+    $('#numDays').val(df.numDays);
+    $('#airport').val(df.airport);
+    $('#arrivals').prop('checked', df.arrivals);
+    $('#departures').prop('checked', df.departures);
+    $('#international').prop('checked', df.international);
+    $('#domestic').prop('checked', df.domestic);
+    $('#carrier').val(df.carrier);
+    $('#delay').val(df.delay);
 
 
     //get form data and then GET flight data based on those choices;
     getFormData($('#controls'), getFlightData);
+
+    $('#controls').change(function(e) {
+
+    });
 
     function getFormData($form, callback) {
       var key, val;
