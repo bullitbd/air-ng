@@ -24,7 +24,7 @@ module.exports = function(req, res) {
         // SQL Query > Select Data
         //
         var sql = {
-      text: 'SELECT * FROM allflts($1,$2,$3) LIMIT 100',
+      text: 'SELECT * FROM allflts($1,$2,$3) LIMIT 1000',
       values: [start, days, airport]
     };
 
@@ -35,8 +35,7 @@ module.exports = function(req, res) {
         query.on('row', function(row) {
           row.ddate = moment(row.ddate).format("YYYY-MM-DD");
             results.push(row);
-            console.log('date: ',row.ddate);
-        });
+          });
 
         // After all data is returned, close connection and return results
         query.on('end', function() {

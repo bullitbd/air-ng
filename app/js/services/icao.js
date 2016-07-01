@@ -4,12 +4,7 @@
 module.exports = {
 
   carriers: [
-
     {
-      "id": "99",
-      "name": "ALL"
-
-    }, {
       "id": "AB",
       "name": "airberlin"
     }, {
