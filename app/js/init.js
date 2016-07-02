@@ -19,26 +19,18 @@ module.exports = {
 
     function initForm(callback) {
 
-      // load carriersel control
+      // load carrier control
       // carriers = carriers module
-      var carriersel = $('select[name=carrier]');
-      $.each(icao.carriers, function(i, obj) {
-        var name = obj.id + '   ' + obj.name;
-        carriersel.append(new Option(name, obj.id));
-      });
-      carriersel.multiselect({
-        includeSelectAllOption: true,
-        allSelectedText: 'All ...',
-        selectAllJustVisible: false,
-        enableFiltering: true,
-        enableCaseInsensitiveFiltering: true,
-        maxHeight: 300,
-        dropRight: true
-          // buttonWidth:100%
-      });
 
-      carriersel.multiselect('selectAll', false);
-      carriersel.multiselect('updateButtonText');
+      // $.each(icao.carriers, function(i, obj) {
+      //   var name = obj.carrier + '   ' + obj.carriername;
+      //   $('#carrier').append(new Option(name, obj.carrier));
+      // });
+      // $('#carrier').val("DL");
+
+      $.each(icao.carriers, function(i,obj) {
+        $('#carrier').append('<option value="'+obj.carrier+'" selected>'+obj.carrier+' '+obj.carriername+'</option>');
+      });
 
       //load airports select
       var airport = $('select[name=airport]');
@@ -48,18 +40,14 @@ module.exports = {
       });
       airport.val(config.defAirport);
 
-
       // load delay select
       var delays = config.delays;
-
       var delay = $('select[name=delay]');
       $.each(delays, function(i, obj) {
         var period = (obj[0] > 0 && obj[0] < 1.5) ? ' hour' : ' hours';
         delay.append(new Option(obj[1] + period, obj[0]));
       });
       delay.val(config.delay);
-      //use selectpicker on these controls;
-      // $('.selectpicker').selectpicker('refresh');
 
       //initialize form controls:
 
@@ -88,15 +76,32 @@ module.exports = {
 
       $inputs.change(function(e) {
         console.log('changed input: ', e.target.name);
-        if (["startDate", "numDays", "airport"].indexOf(e.target.name) > -1) {
-          getFormData($inputs, getFlightData);
-          console.log('big 3');
-        } else {
-          getFormData($inputs, updateDisplayData);
-          console.log('change ok');
-        }
+//********************
+        var data = getFormData($inputs);
+          console.log('data from .change: ', data);
+          if (["startDate", "numDays", "airport"].indexOf(e.target.name) > -1) {
+            console.log('big 3');
+            getFlightData(data, updateDisplayData);
+          } else {
+            console.log('change ok');
+            updateDisplayData(data);
+          }
+
+//********************
+        // setTimeout(function() {
+        //         console.log('$inputs from change(fn): ', $inputs);
+
+        //   if (["startDate", "numDays", "airport"].indexOf(e.target.name) > -1) {
+        //     getFormData($inputs, getFlightData);
+        //     console.log('big 3');
+        //   } else {
+        //     getFormData($inputs, updateDisplayData); //NEXT delay this?
+        //     console.log('change ok');
+        //   }
+        // }, 1); //TODO get rid of this timeout fn.
+
       });
-      console.log('inputs: ', $inputs);
+
 
       callback($inputs, getFlightData);
     }
@@ -107,7 +112,7 @@ module.exports = {
     // form change handler
 
 
-    function getFormData(controls, callback) {
+    function getFormData(controls) { //********** , callback
       var key, val;
       var formVals = {};
       controls.each(function() {
@@ -115,30 +120,17 @@ module.exports = {
         val = ($(this).prop("type") == "checkbox") ? $(this).is(':checked') : $(this).val();
         formVals[key] = val;
       });
-          console.log('formvals: ', formVals);
+          console.log('formvals from getFormData: ', formVals);
 
-      callback(formVals, exposeData);
-    }
-
-    function modelChanged(form) {
-      return function(obj) {
-
-        // return  (((obj.orig == (form.departure && form.airport)) ||
-        //         (obj.dest == (form.arrival && form.airport))) &&
-        //         (form.carrier.indexOf(obj.car) > -1));
-        return ((obj.seats > 300) && (form.carrier.indexOf(obj.car) > -1));
-      };
-    }
-
-    function updateDisplayData(form, callback) {
-      var currData = dbdata.filter(modelChanged(form));
-      callback(currData);
-      console.log('currData: ', currData);
+      //callback(formVals, exposeData);
+      //*************
+      return formVals;
+      //*************
     }
 
 
     function getFlightData(model, callback) { //q is data object
-      console.log('FDmodel: ', model);
+      console.log('model from getFlightData: ', model);
 
       var q = {
         q: model.startDate,
@@ -146,7 +138,7 @@ module.exports = {
         a: model.airport
       };
       var url = 'http://localhost:3000/flights/all';
-      console.log(q, url);
+      console.log('query string: ', q, url);
 
       $.ajax({
         url: url,
@@ -154,32 +146,45 @@ module.exports = {
         dataType: "json",
         success: function(result) {
           dbdata = result;
-          callback(result);
+          callback(model);
+          console.log('result from ajax: ', result);
         },
         error: function(request, status, error) {
-          console.log(request.body, status, request.status, request.responseText);
+          console.log('ERROR:', request.body, status, request.status, request.responseText);
         }
       });
     }
-    // var flightdata;
+
+    function updateDisplayData(form) { //******** , callback
+  console.log('form from updateDisplayData: ', form);
+      var currData = dbdata.filter(modelChanged(form));
+      console.log('filtered from updateDisplayData: ', currData);
+      //callback(currData);
+      exposeData(currData);
+    }
+
+    function modelChanged(form) {
+      console.log('form from modelChanged: ', form);
+      return function(obj) {
+        // console.log('obj from model Changed: ', obj);
+
+        // return  (((obj.orig == (form.departure && form.airport)) ||
+        //         (obj.dest == (form.arrival && form.airport))) &&
+        //         (form.carrier.indexOf(obj.car) > -1));
+        return (form.carrier.indexOf(obj.car) > -1);
+      };
+    }
 
     function exposeData(data) {
 
-
-      // $.each(data, function(key, val) {
-      //   $('#placeholder').append(val.acity);
-
-      // });
-      //flightdata = data;
-      console.log('flightdata inside : ', data);
+      console.log('data from exposeData: ', data);
       makeTable(data);
-
     }
 
     function makeTable(celldata) {
-// console.log(celldata);
+    // console.log(celldata);
       var tmap = config.tableMap;
-              console.log('tmap: ',tmap);
+              // console.log('tmap: ',tmap);
       var content = '<tbody>';
 
       for (var i = 0; i < tmap.length; i++) {
@@ -189,7 +194,7 @@ module.exports = {
 
           content += '<th>' + colhead[0].title + '</th>';
       }
-// console.log(content);
+    // console.log(content);
       $.each(celldata, function(index, val) {
               // console.log('celldata.row: ', val);
 
@@ -211,11 +216,7 @@ module.exports = {
       content += '</tbody>';
       $('#flightTable').html(content);
     }
-
   }
-
-
-
 };
 
 

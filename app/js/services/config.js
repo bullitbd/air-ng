@@ -28,7 +28,7 @@ module.exports = {
     ],
 
     startForm: {
-      numDays: 2,
+      numDays: 1,
       arrivals: false,
       departures: true,
       airport: "LAX",

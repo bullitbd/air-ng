@@ -24,7 +24,7 @@ module.exports = function(req, res) {
         // SQL Query > Select Data
         //
         var sql = {
-      text: 'SELECT * FROM allflts($1,$2,$3) LIMIT 1000',
+      text: 'SELECT * FROM allflts($1,$2,$3)',
       values: [start, days, airport]
     };
 
