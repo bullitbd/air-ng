@@ -8,30 +8,26 @@ var icao = require('./services/icao.js');
 var dbdata = {};
 var $inputs = $('#controls').find("[id]");
 
-
-
 module.exports = {
 
   init: function() {
 
-
-    initForm(getFormData);
-
+    initForm(triggerChange);
 
     function initForm(callback) {
 
       // load carrier control
       // carriers = carriers module
 
-      // $.each(icao.carriers, function(i, obj) {
-      //   var name = obj.carrier + '   ' + obj.carriername;
-      //   $('#carrier').append(new Option(name, obj.carrier));
-      // });
-      // $('#carrier').val("DL");
-
-      $.each(icao.carriers, function(i,obj) { //TODO need to fix the select all problem.
-        $('#carrier').append('<option value="'+obj.carrier+'" selected>'+obj.carrier+' '+obj.carriername+'</option>');
+      $.each(icao.carriers, function(i, obj) {
+        var name = obj.carrier + '   ' + obj.carriername;
+        $('#carrier').append(new Option(name, obj.carrier, true, true));
       });
+      //$('#carrier').val("DL");
+
+      // $.each(icao.carriers, function(i,obj) { //TODO need to fix the select all problem.
+      //   $('#carrier').append('<option value="'+obj.carrier+'" selected>'+obj.carrier+' '+obj.carriername+'</option>');
+      // });
 
       //load airports select
       var airport = $('select[name=airport]');
@@ -72,14 +68,14 @@ module.exports = {
       $('#departures').prop('checked', df.departures);
       $('#international').prop('checked', df.international);
       $('#domestic').prop('checked', df.domestic);
-      $('#carrier').val(df.carrier);
+      //$('#carrier').val(df.carrier);
       $('#delay').val(df.delay);
 
       // inputs onChange handler
 
-      $inputs.change(function(e) {
+      var formChanged = function (e) {
+
         console.log('changed input: ', e.target.name);
-//********************
         var data = getFormData($inputs);
         console.log('data from .change: ', data);
         if (["startDate", "numDays", "airport"].indexOf(e.target.name) > -1) {
@@ -90,16 +86,21 @@ module.exports = {
           updateDisplayData(data);
         }
 
-      });
+      };
 
-      $('select').selectr();
+      $inputs.on('change', formChanged);
 
-      callback($inputs, getFlightData); // cb getFormData
+      //$('select').selectr();
+
+      callback(); // cb triggerChanged
     }
+
+    function triggerChange() {
+        $('#numDays').triggerHandler('change');
+      }
 
     //get form data and then GET flight data based on those choices;
     //called from / returned to $inputs.onChange handler;
-
     function getFormData(controls) { //********** , callback
       var key, val;
       var formVals = {};
@@ -110,10 +111,7 @@ module.exports = {
       });
           console.log('formvals from getFormData: ', formVals);
 
-      //callback(formVals, exposeData);
-      //*************
       return formVals;
-      //*************
     }
 
     // flight data ajax call to server api - uses server route to postgres function;
@@ -134,9 +132,9 @@ module.exports = {
         data: q,
         dataType: "json",
         success: function(result) {
+          console.log('result from ajax: ', result);
           dbdata = result; // store result for continued use;
           callback(model);
-          console.log('result from ajax: ', result);
         },
         error: function(request, status, error) {
           console.log('ERROR:', request.body, status, request.status, request.responseText);
@@ -147,14 +145,14 @@ module.exports = {
     // update Display called from $input.onChange and getFlightData as cb; provides filter with modelChange() for displayed data (calls exposeData);
 
     function updateDisplayData(form) { //******** , callback
-  console.log('form from updateDisplayData: ', form);
+    console.log('form from updateDisplayData: ', form);
       var currData = dbdata.filter(modelChanged(form));
       console.log('filtered from updateDisplayData: ', currData);
       //callback(currData);
       exposeData(currData);
     }
 
-    function modelChanged(form) {
+    function modelChanged(form) { //filter fn for dbdata.filter
       console.log('form from modelChanged: ', form);
       return function(obj) {
         // console.log('obj from model Changed: ', obj);
