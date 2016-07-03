@@ -7,6 +7,7 @@ var df = config.startForm;
 var icao = require('./services/icao.js');
 var dbdata = {};
 var $inputs = $('#controls').find("[id]");
+console.log($inputs);
 
 module.exports = {
 
@@ -29,13 +30,24 @@ module.exports = {
       //   $('#carrier').append('<option value="'+obj.carrier+'" selected>'+obj.carrier+' '+obj.carriername+'</option>');
       // });
 
-      //load airports select
+      // load airports select
       var airport = $('select[name=airport]');
       $.each(icao.airports, function(i, obj) {
         var name = obj.id + '   ' + obj.name;
         airport.append(new Option(name, obj.id));
       });
       airport.val(config.defAirport);
+
+      // var airport = $('#airport');  //attempt at using bootstrap dropdown...
+      // $.each(icao.airports, function(i, obj) {
+      //   var name = obj.id + '   ' + obj.name;
+      //   airport.append('<li value="obj.id">'+obj.name+'</li>');
+      // });
+      // $('.dropdown-menu a').on('click', function(){
+      //   $('.dropdown-toggle').html($(this).html() + '<span class="caret"></span>');
+      //   airport.val($(this).val());
+      // });
+      //   airport.val(config.defAirport);
 
       // load delay select
       var delays = config.delays;
@@ -90,7 +102,7 @@ module.exports = {
 
       $inputs.on('change', formChanged);
 
-      $('select').selectr();
+      //  $('select').selectr();
 
       callback(); // cb triggerChanged
     }
