@@ -90,7 +90,7 @@ module.exports = {
 
       $inputs.on('change', formChanged);
 
-      //$('select').selectr();
+      $('select').selectr();
 
       callback(); // cb triggerChanged
     }
