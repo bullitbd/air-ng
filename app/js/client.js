@@ -5,6 +5,7 @@ var $ = require('jquery');
 window.jQuery = $;
 window.$ = $;
 
+var datepicker = require('./lib/bootstrap-datepicker.js');
 var init = require('./init.js').init;
 
 $(function() {
