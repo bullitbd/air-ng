@@ -4,9 +4,10 @@
 <head>
   <meta charset="utf-8">
   <title>My website</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="css/style.css" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="../build/css/style.css" type="text/css">
 </head>
 
 <body>
@@ -60,8 +61,17 @@
             <label>
               <input type="checkbox" id="international" name="international">International</label>
           </div>
-          <select class="form-control" multiple="multiple" name="carrier" id="carrier"></select>
+          <select class="form-control" multiple name="carrier" id="carrier">
+            <Option value='AB'>AB</Option>
+            <Option value='BC'>BC</Option>
+            <Option value='DE'>DE</Option>
+            <Option value='GH'>GH</Option>
+          </select>
         </div>
+        <<script type="text/javascript">
+          $('#carrier option').prop('selected', true);
+          console.log($('#carrier option'));
+        </script>
 
         <div class="form-group">
           <!-- http://stackoverflow.com/questions/23662150/bootstrap-3-dropdown-select -->
@@ -101,7 +111,6 @@
   </div>
   <!-- container -->
 
-  <script src="bundle.js" charset="utf-8"></script>
 </body>
 
 </html>

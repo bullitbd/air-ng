@@ -6,7 +6,5 @@
 **/docs/
 **/build/
 test/**/*bundle.js
-bobnotes
-bobchanges
 /app/test.html
-/app/js/services/updateTable.js
+**/sandbox/
