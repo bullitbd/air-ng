@@ -75,43 +75,30 @@ module.exports = {
       $('#carrier').val(df.carrier);
       $('#delay').val(df.delay);
 
+      // inputs onChange handler
+
       $inputs.change(function(e) {
         console.log('changed input: ', e.target.name);
 //********************
         var data = getFormData($inputs);
-          console.log('data from .change: ', data);
-          if (["startDate", "numDays", "airport"].indexOf(e.target.name) > -1) {
-            console.log('big 3');
-            getFlightData(data, updateDisplayData);
-          } else {
-            console.log('change ok');
-            updateDisplayData(data);
-          }
-
-//********************
-        // setTimeout(function() {
-        //         console.log('$inputs from change(fn): ', $inputs);
-
-        //   if (["startDate", "numDays", "airport"].indexOf(e.target.name) > -1) {
-        //     getFormData($inputs, getFlightData);
-        //     console.log('big 3');
-        //   } else {
-        //     getFormData($inputs, updateDisplayData); //NEXT delay this?
-        //     console.log('change ok');
-        //   }
-        // }, 1); //TODO get rid of this timeout fn.
+        console.log('data from .change: ', data);
+        if (["startDate", "numDays", "airport"].indexOf(e.target.name) > -1) {
+          console.log('big 3');
+          getFlightData(data, updateDisplayData);
+        } else {
+          console.log('change ok');
+          updateDisplayData(data);
+        }
 
       });
 
       $('select').selectr();
-      callback($inputs, getFlightData);
+
+      callback($inputs, getFlightData); // cb getFormData
     }
 
     //get form data and then GET flight data based on those choices;
-    // getFormData($inputs, getFlightData);
-
-    // form change handler
-
+    //called from / returned to $inputs.onChange handler;
 
     function getFormData(controls) { //********** , callback
       var key, val;
@@ -129,11 +116,12 @@ module.exports = {
       //*************
     }
 
+    // flight data ajax call to server api - uses server route to postgres function;
 
-    function getFlightData(model, callback) { //q is data object
+    function getFlightData(model, callback) { //called from init and $input.onChange
       console.log('model from getFlightData: ', model);
 
-      var q = {
+      var q = { // query string
         q: model.startDate,
         d: model.numDays,
         a: model.airport
@@ -146,7 +134,7 @@ module.exports = {
         data: q,
         dataType: "json",
         success: function(result) {
-          dbdata = result;
+          dbdata = result; // store result for continued use;
           callback(model);
           console.log('result from ajax: ', result);
         },
@@ -155,6 +143,8 @@ module.exports = {
         }
       });
     }
+
+    // update Display called from $input.onChange and getFlightData as cb; provides filter with modelChange() for displayed data (calls exposeData);
 
     function updateDisplayData(form) { //******** , callback
   console.log('form from updateDisplayData: ', form);
@@ -182,10 +172,11 @@ module.exports = {
       makeTable(data);
     }
 
+    //create table using filtered data from updateDisplayData via exposeData
+
     function makeTable(celldata) {
-    // console.log(celldata);
+
       var tmap = config.tableMap;
-              // console.log('tmap: ',tmap);
       var content = '<tbody>';
 
       for (var i = 0; i < tmap.length; i++) {
@@ -195,22 +186,16 @@ module.exports = {
 
           content += '<th>' + colhead[0].title + '</th>';
       }
-    // console.log(content);
-      $.each(celldata, function(index, val) {
-              // console.log('celldata.row: ', val);
 
+      $.each(celldata, function(index, val) {
         content += '<tr>';
 
         for (var i = 0; i < tmap.length; i++) {
-
           var mapobj = tmap.filter(function(obj) {
             return obj.pos == i;
-              // console.log('mapobj: ', mapobj);
-
           });
           content += '<td>' + val[mapobj[0].data] + '</td>';
         }
-
         content += '</tr>';
       });
 
