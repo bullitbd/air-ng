@@ -14,6 +14,7 @@ module.exports = {
 
   init: function() {
 
+
     initForm(getFormData);
 
 
@@ -28,7 +29,7 @@ module.exports = {
       // });
       // $('#carrier').val("DL");
 
-      $.each(icao.carriers, function(i,obj) {
+      $.each(icao.carriers, function(i,obj) { //TODO need to fix the select all problem.
         $('#carrier').append('<option value="'+obj.carrier+'" selected>'+obj.carrier+' '+obj.carriername+'</option>');
       });
 
@@ -102,7 +103,7 @@ module.exports = {
 
       });
 
-
+      $('select').selectr();
       callback($inputs, getFlightData);
     }
 

@@ -1,15 +1,11 @@
 'use strict';
 
+require('selectr');
 var $ = require('jquery');
 window.jQuery = $;
 window.$ = $;
 
-require('bootstrap-multiselect');
-require('./lib/bootstrap-datepicker.js');
-
 var init = require('./init.js').init;
-// var flightdata = require('./init.js').flightdata;
-// require('./controllers/mainCtrl.js');
 
 $(function() {
   init();
