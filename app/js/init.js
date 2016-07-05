@@ -7,6 +7,7 @@ var df = config.startForm;
 var icao = require('./services/icao.js');
 var dbdata = {};
 var $inputs = $('#controls').find("[id]");
+var moment = require('moment');
 console.log($inputs);
 
 module.exports = {
@@ -14,6 +15,8 @@ module.exports = {
   init: function() {
 
     initForm(triggerChange);
+
+    //***********************************************************************
 
     function initForm(callback) {
 
@@ -85,7 +88,7 @@ module.exports = {
 
       // inputs onChange handler
 
-      var formChanged = function (e) {
+      var formChanged = function(e) {
 
         console.log('changed input: ', e.target.name);
         var data = getFormData($inputs);
@@ -105,11 +108,14 @@ module.exports = {
       //  $('select').selectr();
 
       callback(); // cb triggerChanged
-    }
+
+    } // function initForm end;
+
+    //***********************************************************************
 
     function triggerChange() {
-        $('#numDays').triggerHandler('change');
-      }
+      $('#numDays').triggerHandler('change');
+    }
 
     //get form data and then GET flight data based on those choices;
     //called from / returned to $inputs.onChange handler;
@@ -121,13 +127,14 @@ module.exports = {
         val = ($(this).prop("type") == "checkbox") ? $(this).is(':checked') : $(this).val();
         formVals[key] = val;
       });
-          console.log('formvals from getFormData: ', formVals);
+      console.log('formvals from getFormData: ', formVals);
 
       return formVals;
     }
 
-    // flight data ajax call to server api - uses server route to postgres function;
+    //***********************************************************************
 
+    // flight data ajax call to server api - uses server route to postgres function;
     function getFlightData(model, callback) { //called from init and $input.onChange
       console.log('model from getFlightData: ', model);
 
@@ -154,33 +161,95 @@ module.exports = {
       });
     }
 
+    //***********************************************************************
+
     // update Display called from $input.onChange and getFlightData as cb; provides filter with modelChange() for displayed data (calls exposeData);
 
     function updateDisplayData(form) { //******** , callback
-    console.log('form from updateDisplayData: ', form);
+      console.log('form from updateDisplayData: ', form);
       var currData = dbdata.filter(modelChanged(form));
       console.log('filtered from updateDisplayData: ', currData);
       //callback(currData);
-      exposeData(currData);
+      exposeData(currData, form);
     }
+
+    //***********************************************************************
 
     function modelChanged(form) { //filter fn for dbdata.filter
       console.log('form from modelChanged: ', form);
+      var criteria;
       return function(obj) {
-        // console.log('obj from model Changed: ', obj);
 
-        // return  (((obj.orig == (form.departure && form.airport)) ||
-        //         (obj.dest == (form.arrival && form.airport))) &&
-        //         (form.carrier.indexOf(obj.car) > -1));
-        return (form.carrier.indexOf(obj.car) > -1);
+        if (form.departures) {
+          if (form.arrivals) {
+            criteria = true;
+          } else {
+            criteria = (obj.orig == form.airport);
+          }
+        } else if (form.arrivals) {
+            criteria = (obj.dest == form.airport);
+        }
+
+        return (form.carrier.indexOf(obj.car) > -1) && criteria;
+
       };
     }
 
-    function exposeData(data) {
+    //***********************************************************************
 
-      console.log('data from exposeData: ', data);
+    function exposeData(data, form) {
+
+      console.log('data from exposeData: ', form, data);
+
+      function panelInfo(data, format) {
+        var counta = 0,
+            countd = 0;
+          // console.log('data: ', data);
+        $.each(data, function(i, obj) {
+          // console.log('count obj: ', obj);
+          if (obj.orig == form.airport) {
+            countd += 1;
+          } else if (obj.dest == form.airport) {
+            counta += 1;
+          }
+        });
+        console.log('counts: a, ', counta, 'd, ', countd);
+        // var resCount = (form.departures && countd) + (form.arrivals && counta);
+
+        var start = moment(form.startDate);
+        var end = moment(start).add(form.numDays - 1, 'days');
+                console.log('numDays: ', form.numDays);
+                console.log('startdate: ', start);
+
+        console.log('enddate: ', end);
+        // var endDate = end.format('LL');
+        var arrdep = function(form) {
+          if (form.arrivals) {
+            if (form.departures) {
+              return counta + ' Flights <em>Arriving at</em> & ' + countd + ' Flights <em>Departing from</em> ';
+            } else {
+              return counta + ' Flights <em>Arriving at</em> ';
+            }
+          } else if (form.departures) {
+            return countd + ' Flights <em>Departing from</em> ';
+          }
+        };
+        var daterange = (!end.isAfter(start)) ? start.format('LL') : start.format('LL') + ' to ' + end.format('LL');
+        var str = (data.length > 0) ? '<strong>' + daterange + '</strong>' + ' &nbsp&nbsp&nbsp' + arrdep(form) + form.airport : '';
+        console.log(str);
+
+        $('#panelInfo span').html(str);
+
+      } // fn panelInfo
+
+      //***********************************************************************
+
       makeTable(data);
-    }
+      panelInfo(data, form);
+
+    } // fn exposeData
+
+    //***********************************************************************
 
     //create table using filtered data from updateDisplayData via exposeData
 
@@ -194,7 +263,7 @@ module.exports = {
           return obj.pos == i;
         });
 
-          content += '<th>' + colhead[0].title + '</th>';
+        content += '<th>' + colhead[0].title + '</th>';
       }
 
       $.each(celldata, function(index, val) {
@@ -214,7 +283,3 @@ module.exports = {
     }
   }
 };
-
-
-//
-
