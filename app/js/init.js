@@ -1,5 +1,5 @@
 'use strict';
-/*jshint -W083 */ //TODO remove in production
+/*jshint -W083 */
 
 var helpers = require('./services/helpers.js');
 var config = require('./services/config.js');
@@ -21,8 +21,8 @@ module.exports = {
     function initForm(callback) {
 
       // load carrier control
-      // carriers = carriers module
 
+      // carriers = carriers module
       $.each(icao.carriers, function(i, obj) {
         var name = obj.carrier + '   ' + obj.carriername;
         $('#carrier').append(new Option(name, obj.carrier, true, true));
@@ -151,21 +151,68 @@ module.exports = {
         data: q,
         dataType: "json",
         success: function(result) {
+          //divide into two datasets on orig/dest = airport
+          var resData = {
+            arrData: [],
+            depData: []
+          };
+          console.log('result', result);
+          var splitData = result.map(function(obj) { //TODO why is returned start one day behind? Fixed I believe...
+            if (obj.orig == model.airport) {
+              resData.depData.push(obj);
+            } else {
+              resData.arrData.push(obj);
+              //console.log(obj.next, obj.ddate);
+            }
+          });
+
+          console.log('split', resData.depData[0], resData.arrData[0]);
+
+
           console.log('result from ajax: ', result);
           dbdata = result; // store result for continued use;
           callback(model);
+
         },
+        // success: function(result) {
+        //   console.log('result from ajax: ', result);
+        //   dbdata = result; // store result for continued use;
+        //   callback(model);
+        // },
         error: function(request, status, error) {
           console.log('ERROR:', request.body, status, request.status, request.responseText);
         }
       });
     }
 
+    // success: function(result){
+    //   var resData = {
+    //     arrData: [],
+    //     depData: []
+    //   };
+
+    //   var splitData = result.map(obj) {
+    //     //divide into two - orig/dest = airport
+    //     if (obj.orig = obj.airport) {
+    //       obj.isoDate = obj.ddate+'T'+obj.dep;
+    //       depData.push(obj);
+    //     } else {
+    //       obj.isoDate = moment(obj.ddate+'T'+obj.arr).add(obj.next, 'days');
+    //       arrData.push(obj);
+    //     }
+    //   };
+
+    //   console.log('result from ajax: ', result);
+    //   dbdata = result; // store result for continued use;
+    //   callback(model);
+
+    // };
+
     //***********************************************************************
 
     // update Display called from $input.onChange and getFlightData as cb; provides filter with modelChange() for displayed data (calls exposeData);
 
-    function updateDisplayData(form) { //******** , callback
+    function updateDisplayData(form) {
       console.log('form from updateDisplayData: ', form);
       var currData = dbdata.filter(modelChanged(form));
       console.log('filtered from updateDisplayData: ', currData);
@@ -201,12 +248,10 @@ module.exports = {
 
       console.log('data from exposeData: ', form, data);
 
-      function panelInfo(data, format) {
+      function panelInfo(data, format) { // info in panel header
         var counta = 0,
             countd = 0;
-          // console.log('data: ', data);
         $.each(data, function(i, obj) {
-          // console.log('count obj: ', obj);
           if (obj.orig == form.airport) {
             countd += 1;
           } else if (obj.dest == form.airport) {
@@ -223,7 +268,7 @@ module.exports = {
 
         console.log('enddate: ', end);
         // var endDate = end.format('LL');
-        var arrdep = function(form) {
+        var arrdep = function(form) { // counts arrivals & departures separately
           if (form.arrivals) {
             if (form.departures) {
               return counta + ' Flights <em>Arriving at</em> & ' + countd + ' Flights <em>Departing from</em> ';
@@ -246,6 +291,7 @@ module.exports = {
 
       makeTable(data);
       panelInfo(data, form);
+      //graphInfo(data); // TODO need to correct arrival dates for value of next;
 
     } // fn exposeData
 
@@ -281,5 +327,32 @@ module.exports = {
       content += '</tbody>';
       $('#flightTable').html(content);
     }
+
+    // function graphPre(data) {
+    //   var graphData = data.map(function(obj) {
+    //     obj.isoDate = obj.ddate+'T'+obj.dep;
+    //     return obj;
+    //   }).sort(function(a, b) {
+    //     var timea = new Date(a.isoDate).getTime();
+    //     var timeb = new Date(b.isoDate).getTime();
+    //     return timea - timeb;
+    //   });
+    //   return graphData;
+    // }
+
+    // function graphData(data) {
+    //   // aggregate over time
+    //    var interval = '15m';
+    //   var blockTime = startDate+'T'+00:00:00 plus interval;
+    //   var graphData = data.map(function(obj) {
+    //     if data.isoDate <= blockTime {
+    //       pax += data.seats;
+    //     } else {
+    //       blockTime += blockTime + interval;
+    //       return {timeBlock:blockTime, pax:pax};
+    //     }
+    //   });
+
+    // }
   }
 };

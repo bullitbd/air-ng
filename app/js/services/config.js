@@ -24,7 +24,9 @@ module.exports = {
       {title: "arrives", data: "arr", pos: 8},
       {title: "seats", data: "seats", pos: 9},
       {title: "a/c", data: "plane", pos: 10},
-      {title: "dow", data: "daynum", pos: 11}
+      //{title: "dow", data: "daynum", pos: 11}
+      {title: "+/-", data: "next", pos: 11},
+
     ],
 
     startForm: {

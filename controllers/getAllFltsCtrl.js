@@ -24,18 +24,20 @@ module.exports = function(req, res) {
         // SQL Query > Select Data
         //
         var sql = {
-      text: 'SELECT * FROM allflts($1,$2,$3)',
-      values: [start, days, airport]
-    };
+          text: 'SELECT * FROM allflts($1,$2,$3)',
+          values: [start, days, airport]
+        };
 
         var query = client.query(sql);
         var thisdate;
 
         // Stream results back one row at a time
         query.on('row', function(row) {
-          row.ddate = moment(row.ddate).format("YYYY-MM-DD");
+          row.isoDate = row.ddate+'T'+row.dep;
+
             results.push(row);
           });
+
 
         // After all data is returned, close connection and return results
         query.on('end', function() {
