@@ -281,7 +281,7 @@ module.exports = {
     //     if data.isoDate <= blockTime {
     //       pax += data.seats;
     //     } else {
-    //       blockTime += blockTime + interval;
+    //       blockTime += interval;
     //       return {timeBlock:blockTime, pax:pax};
     //     }
     //   });
