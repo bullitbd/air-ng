@@ -27,11 +27,6 @@ module.exports = {
         var name = obj.carrier + '   ' + obj.carriername;
         $('#carrier').append(new Option(name, obj.carrier, true, true));
       });
-      //$('#carrier').val("DL");
-
-      // $.each(icao.carriers, function(i,obj) { //TODO need to fix the select all problem.
-      //   $('#carrier').append('<option value="'+obj.carrier+'" selected>'+obj.carrier+' '+obj.carriername+'</option>');
-      // });
 
       // load airports select
       var airport = $('select[name=airport]');
@@ -40,17 +35,6 @@ module.exports = {
         airport.append(new Option(name, obj.id));
       });
       airport.val(config.defAirport);
-
-      // var airport = $('#airport');  //attempt at using bootstrap dropdown...
-      // $.each(icao.airports, function(i, obj) {
-      //   var name = obj.id + '   ' + obj.name;
-      //   airport.append('<li value="obj.id">'+obj.name+'</li>');
-      // });
-      // $('.dropdown-menu a').on('click', function(){
-      //   $('.dropdown-toggle').html($(this).html() + '<span class="caret"></span>');
-      //   airport.val($(this).val());
-      // });
-      //   airport.val(config.defAirport);
 
       // load delay select
       var delays = config.delays;
@@ -83,24 +67,18 @@ module.exports = {
       $('#departures').prop('checked', df.departures);
       $('#international').prop('checked', df.international);
       $('#domestic').prop('checked', df.domestic);
-      //$('#carrier').val(df.carrier);
+      //$('#carrier').val set in load carriers control;
       $('#delay').val(df.delay);
 
       // inputs onChange handler
 
       var formChanged = function(e) {
-
-        console.log('changed input: ', e.target.name);
         var data = getFormData($inputs);
-        console.log('data from .change: ', data);
         if (["startDate", "numDays", "airport"].indexOf(e.target.name) > -1) {
-          console.log('big 3');
           getFlightData(data, updateDisplayData);
         } else {
-          console.log('change ok');
           updateDisplayData(data);
         }
-
       };
 
       $inputs.on('change', formChanged);
@@ -127,8 +105,6 @@ module.exports = {
         val = ($(this).prop("type") == "checkbox") ? $(this).is(':checked') : $(this).val();
         formVals[key] = val;
       });
-      console.log('formvals from getFormData: ', formVals);
-
       return formVals;
     }
 
@@ -136,7 +112,6 @@ module.exports = {
 
     // flight data ajax call to server api - uses server route to postgres function;
     function getFlightData(model, callback) { //called from init and $input.onChange
-      console.log('model from getFlightData: ', model);
 
       var q = { // query string
         q: model.startDate,
@@ -144,7 +119,6 @@ module.exports = {
         a: model.airport
       };
       var url = 'http://localhost:3000/flights/all';
-      console.log('query string: ', q, url);
 
       $.ajax({
         url: url,
@@ -156,57 +130,25 @@ module.exports = {
             arrData: [],
             depData: []
           };
-          console.log('result', result);
-          var splitData = result.map(function(obj) { //TODO why is returned start one day behind? Fixed I believe...
+
+          var splitData = result.map(function(obj) {
             if (obj.orig == model.airport) {
               resData.depData.push(obj);
             } else {
               resData.arrData.push(obj);
-              //console.log(obj.next, obj.ddate);
             }
           });
 
-          console.log('split', resData.depData[0], resData.arrData[0]);
-
-
-          console.log('result from ajax: ', result);
           dbdata = result; // store result for continued use;
-          callback(model);
+          callback(model); // cb updateDisplayData
 
         },
-        // success: function(result) {
-        //   console.log('result from ajax: ', result);
-        //   dbdata = result; // store result for continued use;
-        //   callback(model);
-        // },
+
         error: function(request, status, error) {
           console.log('ERROR:', request.body, status, request.status, request.responseText);
         }
       });
     }
-
-    // success: function(result){
-    //   var resData = {
-    //     arrData: [],
-    //     depData: []
-    //   };
-
-    //   var splitData = result.map(obj) {
-    //     //divide into two - orig/dest = airport
-    //     if (obj.orig = obj.airport) {
-    //       obj.isoDate = obj.ddate+'T'+obj.dep;
-    //       depData.push(obj);
-    //     } else {
-    //       obj.isoDate = moment(obj.ddate+'T'+obj.arr).add(obj.next, 'days');
-    //       arrData.push(obj);
-    //     }
-    //   };
-
-    //   console.log('result from ajax: ', result);
-    //   dbdata = result; // store result for continued use;
-    //   callback(model);
-
-    // };
 
     //***********************************************************************
 
@@ -246,8 +188,6 @@ module.exports = {
 
     function exposeData(data, form) {
 
-      console.log('data from exposeData: ', form, data);
-
       function panelInfo(data, format) { // info in panel header
         var counta = 0,
             countd = 0;
@@ -258,16 +198,9 @@ module.exports = {
             counta += 1;
           }
         });
-        console.log('counts: a, ', counta, 'd, ', countd);
-        // var resCount = (form.departures && countd) + (form.arrivals && counta);
-
         var start = moment(form.startDate);
         var end = moment(start).add(form.numDays - 1, 'days');
-                console.log('numDays: ', form.numDays);
-                console.log('startdate: ', start);
 
-        console.log('enddate: ', end);
-        // var endDate = end.format('LL');
         var arrdep = function(form) { // counts arrivals & departures separately
           if (form.arrivals) {
             if (form.departures) {
@@ -281,7 +214,6 @@ module.exports = {
         };
         var daterange = (!end.isAfter(start)) ? start.format('LL') : start.format('LL') + ' to ' + end.format('LL');
         var str = (data.length > 0) ? '<strong>' + daterange + '</strong>' + ' &nbsp&nbsp&nbsp' + arrdep(form) + form.airport : '';
-        console.log(str);
 
         $('#panelInfo span').html(str);
 
@@ -299,7 +231,7 @@ module.exports = {
 
     //create table using filtered data from updateDisplayData via exposeData
 
-    function makeTable(celldata) {
+    function makeTable(celldata) { // build table to display charted records
 
       var tmap = config.tableMap;
       var content = '<tbody>';
@@ -325,6 +257,7 @@ module.exports = {
       });
 
       content += '</tbody>';
+
       $('#flightTable').html(content);
     }
 

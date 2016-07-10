@@ -19,7 +19,6 @@ function panel() {
   setTimeout(function() {
     formHeight = $('form').height();
     $('#heat').height(formHeight);
-    // console.log(formHeight);
   }, 20);
 }
 

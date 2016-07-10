@@ -21,30 +21,24 @@ module.exports = function(req, res) {
           return res.status(500).json({ success: false, data: err});
         }
 
-        // SQL Query > Select Data
-        //
         var sql = {
           text: 'SELECT * FROM allflts($1,$2,$3)',
           values: [start, days, airport]
         };
 
         var query = client.query(sql);
-        var thisdate;
 
-        // Stream results back one row at a time
+        // Stream results one row at a time
         query.on('row', function(row) {
           row.isoDate = row.ddate+'T'+row.dep;
 
             results.push(row);
           });
 
-
-        // After all data is returned, close connection and return results
+        // close connection and return results
         query.on('end', function() {
             done();
             return res.json(results);
         });
-
     });
-
 };
