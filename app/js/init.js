@@ -20,7 +20,7 @@ module.exports = {
 
 
     initForm(triggerChange);
-    makeChart();
+    drawChart();
 
     //***********************************************************************
 
@@ -294,7 +294,7 @@ module.exports = {
 
     // }
 
-    function makeChart() {
+    function drawChart() {
       $('#main-chart').highcharts({
         chart: {
           type: 'areaspline'
