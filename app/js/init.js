@@ -124,13 +124,11 @@ module.exports = {
         url: url,
         data: q,
         dataType: "json",
-        success: function(result) {
-          //divide into two datasets on orig/dest = airport
-          var resData = {
-            arrData: [],
-            depData: []
-          };
 
+        success: function(result) {
+
+          //divide into two datasets on orig/dest = airport
+          var resData = { arrData: [], depData: [] };
           var splitData = result.map(function(obj) {
             if (obj.orig == model.airport) {
               resData.depData.push(obj);
@@ -141,7 +139,6 @@ module.exports = {
 
           dbdata = result; // store result for continued use;
           callback(model); // cb updateDisplayData
-
         },
 
         error: function(request, status, error) {
@@ -168,7 +165,7 @@ module.exports = {
       console.log('form from modelChanged: ', form);
       var criteria;
       return function(obj) {
-
+        //choose arrivals/departures/both
         if (form.departures) {
           if (form.arrivals) {
             criteria = true;
@@ -178,9 +175,8 @@ module.exports = {
         } else if (form.arrivals) {
             criteria = (obj.dest == form.airport);
         }
-
+        //return carrier in selected AND arrivals/departures
         return (form.carrier.indexOf(obj.car) > -1) && criteria;
-
       };
     }
 
@@ -204,12 +200,12 @@ module.exports = {
         var arrdep = function(form) { // counts arrivals & departures separately
           if (form.arrivals) {
             if (form.departures) {
-              return counta + ' Flights <em>Arriving at</em> & ' + countd + ' Flights <em>Departing from</em> ';
+              return counta + ' Flights <span style="color:#008000"><em>Arriving at</em></span> & ' + countd + ' Flights <span style="color:#0000CD"><em>Departing from</em></span> ';
             } else {
-              return counta + ' Flights <em>Arriving at</em> ';
+              return counta + ' Flights <span style="color:#008000"><em>Arriving at</em></span> ';
             }
           } else if (form.departures) {
-            return countd + ' Flights <em>Departing from</em> ';
+            return countd + ' Flights <span style="color:#0000CD"><em>Departing from</em><span> ';
           }
         };
         var daterange = (!end.isAfter(start)) ? start.format('LL') : start.format('LL') + ' to ' + end.format('LL');
@@ -221,7 +217,7 @@ module.exports = {
 
       //***********************************************************************
 
-      makeTable(data);
+      makeTable(data, form);
       panelInfo(data, form);
       //graphInfo(data); // TODO need to correct arrival dates for value of next;
 
@@ -231,7 +227,7 @@ module.exports = {
 
     //create table using filtered data from updateDisplayData via exposeData
 
-    function makeTable(celldata) { // build table to display charted records
+    function makeTable(celldata, formvals) { // build table to display charted records
 
       var tmap = config.tableMap;
       var content = '<tbody>';
@@ -243,9 +239,13 @@ module.exports = {
 
         content += '<th>' + colhead[0].title + '</th>';
       }
-
       $.each(celldata, function(index, val) {
-        content += '<tr>';
+
+        if (val.dest == formvals.airport) {
+          content += '<tr style="color:#008000">';
+        } else {
+          content += '<tr style="color:#0000CD">';
+        }
 
         for (var i = 0; i < tmap.length; i++) {
           var mapobj = tmap.filter(function(obj) {
