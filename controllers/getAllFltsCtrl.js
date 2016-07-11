@@ -30,28 +30,30 @@ module.exports = function(req, res) {
 
     // Stream results one row at a time
     query.on('row', function(row) {
-      row.isoDate = row.ddate+'T'+row.dep;
+      row.isoDate = row.ddate+' '+row.dep;
       results.push(row);
     });
 
     // close connection and return results
     query.on('end', function() { // TODO sort out sorting!
       done();
-      //console.log(results);
+
+      //sort results on datetime
+      results.sort(function(a,b) {
+        var timea = (a.isoDate);
+        var timeb = (b.isoDate);
+        // console.log('a: '+timea + ' b: ' + timeb);
+
+        if (timea > timeb) {
+          return 1;
+        } else if (timeb > timea) {
+          return -1;
+        } else {
+          return 0;
+        }
+
+      });
       return res.json(results);
     });
-
-    // function sortResults(responder) {
-    //   var sorted = results.sort(function(a, b) {
-    //     var timea = new Date(a.isoDate).getTime();
-    //     var timeb = new Date(b.isoDate).getTime();
-    //     return timea - timeb;
-    //   });
-    //   responder(sorted);
-    // }
-
-    // function sendResponse(data) {
-
-    // }
   });
 };

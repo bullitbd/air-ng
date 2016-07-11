@@ -17,6 +17,7 @@ module.exports = {
       {title: "flight", data: "flt", pos: 1},
       {title: "from", data: "orig", pos: 2},
       {title: "", data: "dcity", pos:3},
+
       {title: "date", data: "ddate", pos: 4},
       {title: "departs", data: "dep", pos: 5},
       {title: "to", data: "dest", pos: 6},
@@ -26,6 +27,7 @@ module.exports = {
       {title: "a/c", data: "plane", pos: 10},
       //{title: "dow", data: "daynum", pos: 11}
       {title: "+/-", data: "next", pos: 11},
+      //{title: "range", data: "daterange", pos:12}
 
     ],
 
