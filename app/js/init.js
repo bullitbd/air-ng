@@ -1,6 +1,7 @@
 'use strict';
 /*jshint -W083 */
 
+var Highcharts = require('highcharts');
 var helpers = require('./services/helpers.js');
 var config = require('./services/config.js');
 var df = config.startForm;
@@ -8,13 +9,18 @@ var icao = require('./services/icao.js');
 var dbdata = {};
 var $inputs = $('#controls').find("[id]");
 var moment = require('moment');
-console.log($inputs);
+require('highcharts/modules/exporting')(Highcharts);
+
+
+//console.log($inputs);
 
 module.exports = {
 
   init: function() {
 
+
     initForm(triggerChange);
+    makeChart();
 
     //***********************************************************************
 
@@ -176,7 +182,7 @@ module.exports = {
             criteria = (obj.orig == form.airport);
           }
         } else if (form.arrivals) {
-            criteria = (obj.dest == form.airport);
+          criteria = (obj.dest == form.airport);
         }
 
         return (form.carrier.indexOf(obj.car) > -1) && criteria;
@@ -190,7 +196,7 @@ module.exports = {
 
       function panelInfo(data, format) { // info in panel header
         var counta = 0,
-            countd = 0;
+          countd = 0;
         $.each(data, function(i, obj) {
           if (obj.orig == form.airport) {
             countd += 1;
@@ -287,5 +293,93 @@ module.exports = {
     //   });
 
     // }
+
+    function makeChart() {
+      $('#main-chart').highcharts({
+        chart: {
+          type: 'areaspline'
+        },
+        title: {
+          text: 'Average fruit consumption during one week'
+        },
+
+        legend: {
+          layout: 'vertical',
+          align: 'left',
+          verticalAlign: 'top',
+          x: 150,
+          y: 100,
+          floating: true,
+          borderWidth: 1,
+          backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+        },
+        xAxis: {
+          categories: [
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday',
+            'Saturday',
+            'Sunday',
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday',
+            'Saturday',
+            'Sunday'
+          ]//,
+          // plotBands: [{ // visualize the weekend
+          //   from: 4.5,
+          //   to: 6.5,
+          //   color: 'rgba(68, 170, 213, .2)'
+          // }]
+        },
+        yAxis: {
+          title: {
+            text: 'Fruit units'
+          }
+        },
+        tooltip: {
+          shared: true,
+          valueSuffix: ' units',
+          crosshairs: {
+            width: 2
+          }
+        },
+        credits: {
+          enabled: false
+        },
+        plotOptions: {
+          areaspline: {
+            fillOpacity: 0.2
+          },
+          series: {
+            marker: {
+              enabled: false,
+              states: {
+                hover: {
+                  enabled: false
+                }
+              }
+            }
+          },
+          line: {
+            marker: {
+              enabled: false
+            }
+          }
+        },
+
+        series: [{
+          name: 'John',
+          data: [3, 4, 3, 5, 4, 10, 12, 1, 3, 4, 3, 3, 5, 4]
+        }, {
+          name: 'Jane',
+          data: [1, 3, 4, 3, 3, 5, 4, 3, 4, 3, 5, 4, 10, 12]
+        }]
+      });
+    }
   }
 };
