@@ -6,7 +6,6 @@ var app = express();
 var path = require('path');
 var morgan = require('morgan');
 
-
 var flightRoutes = express.Router();
 require('./routes/flight_routes.js')(flightRoutes);
 

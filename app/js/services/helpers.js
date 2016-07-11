@@ -4,23 +4,7 @@ var model = {};
 
 module.exports = {
 
-  // getAllFlights: function getFlightData(q) { //q is data object
-  //   var url = 'localhost:3000/flights/all';
-  //   $.getJSON(url, q, function(data) {
-  //     return data;
-  //   });
-  // },
 
-  // getForm: function getFormData($form) {
-  //   var key, val;
-  //   model = {};
-  //   $form.find("[id]").each(function() {
-  //     key = $(this).prop("id");
-  //     val = ($(this).prop("type") == "checkbox") ? $(this).is(':checked') : $(this).val();
-  //     model[key] = val;
-  //   });
-  //   return model;
-  // },
 
 };
 

@@ -2,44 +2,58 @@
 
 var pg = require('pg');
 var db = require('../config.js').db; //TODO split this out server/client
+var moment = require('moment');
 
 module.exports = function(req, res) {
 
-    var start = req.query.q;
-    var days = req.query.d;
-    var airport = req.query.a;
+  var start = req.query.q;
+  var days = req.query.d;
+  var airport = req.query.a;
 
-    var results = [];
+  var results = [];
 
-    // Get a Postgres client from the connection pool
-    pg.connect(db, function(err, client, done) {
-        // Handle connection errors
-        if(err) {
-          done();
-          console.log(err);
-          return res.status(500).json({ success: false, data: err});
-        }
+  // Get a Postgres client from the connection pool
+  pg.connect(db, function(err, client, done) {
+    // Handle connection errors
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({ success: false, data: err});
+    }
 
-        // SQL Query > Select Data
-        //
-        var sql = {
+    var sql = {
       text: 'SELECT * FROM allflts($1,$2,$3)',
       values: [start, days, airport]
     };
 
-        var query = client.query(sql);
+    var query = client.query(sql);
 
-        // Stream results back one row at a time
-        query.on('row', function(row) {
-            results.push(row);
-        });
-
-        // After all data is returned, close connection and return results
-        query.on('end', function() {
-            done();
-            return res.json(results);
-        });
-
+    // Stream results one row at a time
+    query.on('row', function(row) {
+      row.isoDate = row.ddate+' '+row.dep;
+      results.push(row);
     });
 
+    // close connection and return results
+    query.on('end', function() { // TODO sort out sorting!
+      done();
+
+      //sort results on datetime
+      results.sort(function(a,b) {
+        var timea = (a.isoDate);
+        var timeb = (b.isoDate);
+        // console.log('a: '+timea + ' b: ' + timeb);
+
+        if (timea > timeb) {
+          return 1;
+        } else if (timeb > timea) {
+          return -1;
+        } else {
+          return 0;
+        }
+
+      });
+      return res.json(results);
+    });
+  });
 };

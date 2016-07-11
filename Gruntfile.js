@@ -102,7 +102,13 @@ module.exports = function(grunt) {
           path: 'build/',
           filename: 'bundle.js'
         }
-      },
+      }
+      // plugins: [
+      //   new webpack.ProvidePlugin({
+      //       'window.jQuery': 'jquery',
+      //       'window.$': 'jquery',
+      //   })
+      // ]
       // karma_test: {
       //   entry: __dirname + '/test/karma_tests/test_entry.js',
       //   output: {

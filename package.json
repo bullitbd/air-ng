@@ -25,11 +25,14 @@
   "homepage": "https://github.com/bullitbd/airheat",
   "dependencies": {
     "bootstrap": "^3.3.6",
+    "bootstrap-multiselect": "^0.9.13-1",
     "bootstrap-styl": "^5.0.5",
     "express": "^4.13.4",
     "jquery": "^3.0.0",
     "lodash": "^4.13.1",
-    "pg": "^5.1.0"
+    "moment": "^2.13.0",
+    "pg": "^5.1.0",
+    "selectr": "^2.0.2"
   },
   "devDependencies": {
     "grunt": "^1.0.1",
