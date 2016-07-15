@@ -80,11 +80,11 @@ module.exports = {
       // inputs onChange handler
 
       var formChanged = function(e) {
-        var form = getFormData($inputs);
+        var formVals = getFormData($inputs);
         if (["startDate", "numDays", "airport"].indexOf(e.target.name) > -1) {
-          getFlightData(form, updateDisplayData);
+          getFlightData(formVals, updateDisplayData);
         } else {
-          updateDisplayData(form);
+          updateDisplayData(formVals);
         }
       };
 
@@ -134,16 +134,6 @@ module.exports = {
         dataType: "json",
 
         success: function(result) {
-
-          //divide into two datasets on orig/dest = airport
-          // var resData = { arrData: [], depData: [] };
-          // var splitData = result.map(function(obj) {
-          //   if (obj.orig == model.airport) {
-          //     resData.depData.push(obj);
-          //   } else {
-          //     resData.arrData.push(obj);
-          //   }
-          // });
 
           dbdata = result; // store result for continued use;
           callback(model); // cb updateDisplayData
@@ -226,79 +216,53 @@ module.exports = {
       // ****************** CHART FUNCTIONS ***********************
 
 
-      function makeSlots(data,controls,cb) { // important! these need to remain sorted!
+      function makeSlots(data,controls,cb) { // important! these need to remain sorted! make 2 sets of slots for arrivals and departures populate
         var period = 5, // minutes TODO add input control
             intervals = controls.numDays   * 86400 / period / 60, //total # of slots
-            slots = [],
+            slots = { arrSlots: [], depSlots: [] },
             start = moment(controls.startDate);
                             // console.log(intervals);
         for (var i = 0; i < intervals; i++) {
           var date = moment(start).add((i+1) * period, 'minutes').format('YYYY-MM-DD HH:mm:ss');
-          slots.push({date:date.split(' '), pax:0, flights:[]});
+          for (var prop in slots) {
+            slots[prop].push({date:date.split(' '), pax:0, flights:[]});
+          }
         }
-        cb(data,slots,drawChart); // cb = makeChartData
-      }
-
-      makeSlots(data, form, makeChartData);
-
+        console.log('slots array: ',slots);
+        cb(data,slots,controls,drawChart); // cb = makeChartData
+      } // fn makeSlots
 
 
-      function makeChartData(data, slots, cb) { // cb = drawChart
+      function makeChartData(data, slots, form, cb) { // cb = drawChart
         data.forEach(function(row) {
+          var j = getSlot(row);
+          // split into separate series
+          if( row.dest == form.airport ) {
+            slots.arrSlots[j].flights.push(row);
+            slots.arrSlots[j].pax += row.seats;
+          } else {
+            slots.depSlots[j].flights.push(row);
+            slots.depSlots[j].pax += row.seats;
+          }
 
-          function getSlot(obj) {
-            for (var i = 0; i < slots.length; i++) {
-              if (obj.isodate <= slots[i].date.join(' ')) {
+          function getSlot(obj) { // if obj date <= slot date return row push
+            // console.log('getSlot obj? ',obj);
+            for (var i = 0; i < slots.arrSlots.length; i++) {
+              if (obj.isodate <= slots.arrSlots[i].date.join(' ')) {
                 return i;
               }
             }
           }
-
-          var j = getSlot(row);
-          slots[j].flights.push(row);
-          slots[j].pax += row.seats;
-
         });
-              console.log(slots);
-              cb(slots, form); // drawChart()
-      }
+        cb(slots, form); // drawChart()
+      } // fn makeChartData
 
-
-
-
-
-        // console.log('datazero', data[0]);
-        // var periods = {}
-        //     slotNum = 0,
-        //     pax = 0,
-        //     flights = [],
-        //     begin = new Date(data[0].ddate + ' ' + '00:00:00').getTime(),
-        //     arr = [];
-
-        // var chartData = data.map(function(obj) {
-
-        // console.log('ROW: ',obj);
-        //           var slot = {};
-        //           row [slot] = Math.trunc((new Date(row.isoDate).getTime() - begin)/interval/1000);
-        //           console.log(new Date(row.isoDate).getTime() - begin);
-        //                     console.log(row.isoDate);
-        //           console.log(slot);
-
-        //             arr[slot].flights.push(row);
-        //             arr[slot].pax += row.seats;
-
-        //           return arr;
-      //   });
-      // return chartData;
-      // };
 
       //*********************************************************************
 
       makeTable(data, form);
       panelInfo(data, form);
-      //console.log(graphData(data, form));
-      //drawChart(data, form);
-      //graphInfo(data); // TODO need to correct arrival dates for value of next;
+      makeSlots(data, form, makeChartData);
 
     } // fn exposeData
 
@@ -339,49 +303,25 @@ module.exports = {
       $('#flightTable').html(content);
     }
 
-    // function graphData(data) {
-    //   // aggregate over time
-    //    var interval = '15m';
-    //   var blockTime = startDate+'T'+00:00:00 plus interval;
-    //   var graphData = data.map(function(obj) {
-    //     if data.isoDate <= blockTime {
-    //       pax += data.seats;
-    //     } else {
-    //       blockTime += interval;
-    //       return {timeBlock:blockTime, pax:pax};
-    //     }
-    //   });
-
-    // }
-
-
-
-
-
-
-    //   var interval = 15;
-    //   var current = data[0].ddate + ' 00:' + interval + ':00';
-    //   //divisions are days * 24*60/interval
-    //   var limit = form.days * 24 * (60/interval);
-    //   for (var i = 0; i < limit; i++) { // each time
-    //     while (data.isoDate <= current) {
-
-    //     }
-    //     limit   }
-
-
-    function drawChart(data, formvals) {
+    function drawChart(slots, formvals) { // makeChartData cb
       var xvals = [],
-          yvals0 = [],
-          yvals1 = [];
+          y0 = slots.arrSlots,
+          y1 = slots.depSlots,
+          s0 = [], // TODO check if empty array ok here...
+          s1 = [];
 
-      data.forEach(function(obj) {
-        // console.log('data from drawChart? ', obj);
-        //xvals.push(Date.parse(obj.date.join('T')));
-        //if (obj.date[1] == formvals())
-        yvals0.push([Date.parse(obj.date.join('T')),obj.pax]);
+          // TODO add drilldown to flight info;
+          // TODO combine below into single function
 
+      y0.forEach(function(obj) {
+        s0.push([Date.parse(obj.date.join('T')),obj.pax]);
       });
+
+      y1.forEach(function(obj) {
+        s1.push([Date.parse(obj.date.join('T')),obj.pax]);
+      });
+
+
       $('#main-chart').highcharts({
         chart: {
           type: 'areaspline',
@@ -447,19 +387,18 @@ module.exports = {
 
         series: [{
           name: 'Arrivals',
-          data: yvals0,
+          data: s0,
           // [3, 4, 3, 5, 4, 10, 12, 1, 3, 4, 3, 3, 5, 4],
+          fillColor:'rgba(0,128,0,0.3)',
+          lineWidth:0
+
+
+        }, {
+          name: 'Departures',
+          data: s1, // [1, 3, 4, 3, 3, 5, 4, 3, 4, 3, 5, 4, 10, 12],
           fillColor:'rgba(0,0,205,0.3)',
-          lineWidth:0,
-
-
-        }// }, {
-        //   name: 'Departures',
-        //   data: [1, 3, 4, 3, 3, 5, 4, 3, 4, 3, 5, 4, 10, 12],
-        //   fillColor:'rgba(0,128,0,0.3)',
-        //   lineWidth:0
-        // }]
-        ]
+          lineWidth:0
+        }]
       });
     }
   }
