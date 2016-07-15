@@ -9,7 +9,8 @@ var icao = require('./services/icao.js');
 var dbdata = {};
 var $inputs = $('#controls').find("[id]");
 var moment = require('moment');
-require('highcharts/modules/exporting')(Highcharts);
+//require('highcharts/modules/exporting')(Highcharts);
+//require('highcharts/themes/air.js')(Highcharts);
 
 
 //console.log($inputs);
@@ -79,11 +80,11 @@ module.exports = {
       // inputs onChange handler
 
       var formChanged = function(e) {
-        var data = getFormData($inputs);
+        var form = getFormData($inputs);
         if (["startDate", "numDays", "airport"].indexOf(e.target.name) > -1) {
-          getFlightData(data, updateDisplayData);
+          getFlightData(form, updateDisplayData);
         } else {
-          updateDisplayData(data);
+          updateDisplayData(form);
         }
       };
 
@@ -91,19 +92,20 @@ module.exports = {
 
       //  $('select').selectr();
 
+
       callback(); // cb triggerChanged
 
     } // function initForm end;
 
     //***********************************************************************
 
-    function triggerChange() {
-      $('#numDays').triggerHandler('change');
+    function triggerChange() { // setup initial state
+      $('#numDays').triggerHandler('change'); // fire $inputs.on('change', formChanged);
     }
 
     //get form data and then GET flight data based on those choices;
     //called from / returned to $inputs.onChange handler;
-    function getFormData(controls) { //********** , callback
+    function getFormData(controls) {
       var key, val;
       var formVals = {};
       controls.each(function() {
@@ -134,14 +136,14 @@ module.exports = {
         success: function(result) {
 
           //divide into two datasets on orig/dest = airport
-          var resData = { arrData: [], depData: [] };
-          var splitData = result.map(function(obj) {
-            if (obj.orig == model.airport) {
-              resData.depData.push(obj);
-            } else {
-              resData.arrData.push(obj);
-            }
-          });
+          // var resData = { arrData: [], depData: [] };
+          // var splitData = result.map(function(obj) {
+          //   if (obj.orig == model.airport) {
+          //     resData.depData.push(obj);
+          //   } else {
+          //     resData.arrData.push(obj);
+          //   }
+          // });
 
           dbdata = result; // store result for continued use;
           callback(model); // cb updateDisplayData
@@ -151,7 +153,7 @@ module.exports = {
           console.log('ERROR:', request.body, status, request.status, request.responseText);
         }
       });
-    }
+    } // fn getFlightData
 
     //***********************************************************************
 
@@ -160,7 +162,7 @@ module.exports = {
     function updateDisplayData(form) {
       console.log('form from updateDisplayData: ', form);
       var currData = dbdata.filter(modelChanged(form));
-      console.log('filtered from updateDisplayData: ', currData);
+      //console.log('filtered from updateDisplayData: ', currData);
       //callback(currData);
       exposeData(currData, form);
     }
@@ -170,10 +172,10 @@ module.exports = {
     function modelChanged(form) { //filter fn for dbdata.filter
       console.log('form from modelChanged: ', form);
       var criteria;
-      return function(obj) {
+      return function(obj) { // obj is 'each' of dbdata.filter
         //choose arrivals/departures/both
-        if (form.departures) {
-          if (form.arrivals) {
+        if (form.departures) { // if departures checked
+          if (form.arrivals) { // and arrivals checked
             criteria = true;
           } else {
             criteria = (obj.orig == form.airport);
@@ -182,7 +184,7 @@ module.exports = {
           criteria = (obj.dest == form.airport);
         }
         //return carrier in selected AND arrivals/departures
-        return (form.carrier.indexOf(obj.car) > -1) && criteria;
+        return (form.carrier.indexOf(obj.car) > -1) && criteria; // filter for carrier
       };
     }
 
@@ -192,7 +194,7 @@ module.exports = {
 
       function panelInfo(data, format) { // info in panel header
         var counta = 0,
-          countd = 0;
+            countd = 0;
         $.each(data, function(i, obj) {
           if (obj.orig == form.airport) {
             countd += 1;
@@ -221,10 +223,81 @@ module.exports = {
 
       } // fn panelInfo
 
-      //***********************************************************************
+      // ****************** CHART FUNCTIONS ***********************
+
+
+      function makeSlots(data,controls,cb) { // important! these need to remain sorted!
+        var period = 5, // minutes TODO add input control
+            intervals = controls.numDays   * 86400 / period / 60, //total # of slots
+            slots = [],
+            start = moment(controls.startDate);
+                            // console.log(intervals);
+        for (var i = 0; i < intervals; i++) {
+          var date = moment(start).add((i+1) * period, 'minutes').format('YYYY-MM-DD HH:mm:ss');
+          slots.push({date:date.split(' '), pax:0, flights:[]});
+        }
+        cb(data,slots,drawChart); // cb = makeChartData
+      }
+
+      makeSlots(data, form, makeChartData);
+
+
+
+      function makeChartData(data, slots, cb) { // cb = drawChart
+        data.forEach(function(row) {
+
+          function getSlot(obj) {
+            for (var i = 0; i < slots.length; i++) {
+              if (obj.isodate <= slots[i].date.join(' ')) {
+                return i;
+              }
+            }
+          }
+
+          var j = getSlot(row);
+          slots[j].flights.push(row);
+          slots[j].pax += row.seats;
+
+        });
+              console.log(slots);
+              cb(slots, form); // drawChart()
+      }
+
+
+
+
+
+        // console.log('datazero', data[0]);
+        // var periods = {}
+        //     slotNum = 0,
+        //     pax = 0,
+        //     flights = [],
+        //     begin = new Date(data[0].ddate + ' ' + '00:00:00').getTime(),
+        //     arr = [];
+
+        // var chartData = data.map(function(obj) {
+
+        // console.log('ROW: ',obj);
+        //           var slot = {};
+        //           row [slot] = Math.trunc((new Date(row.isoDate).getTime() - begin)/interval/1000);
+        //           console.log(new Date(row.isoDate).getTime() - begin);
+        //                     console.log(row.isoDate);
+        //           console.log(slot);
+
+        //             arr[slot].flights.push(row);
+        //             arr[slot].pax += row.seats;
+
+        //           return arr;
+      //   });
+      // return chartData;
+      // };
+
+      //*********************************************************************
 
       makeTable(data, form);
       panelInfo(data, form);
+      //console.log(graphData(data, form));
+      //drawChart(data, form);
       //graphInfo(data); // TODO need to correct arrival dates for value of next;
 
     } // fn exposeData
@@ -233,12 +306,11 @@ module.exports = {
 
     //create table using filtered data from updateDisplayData via exposeData
 
-    function makeTable(celldata, formvals) { // build table to display charted records
-
+    function makeTable(celldata, formvals) {//build table to display charted records
       var tmap = config.tableMap;
       var content = '<tbody>';
 
-      for (var i = 0; i < tmap.length; i++) {
+      for (var i = 0; i < tmap.length; i++) { // get <th> rows
         var colhead = tmap.filter(function(obj) {
           return obj.pos == i;
         });
@@ -267,18 +339,6 @@ module.exports = {
       $('#flightTable').html(content);
     }
 
-    // function graphPre(data) {
-    //   var graphData = data.map(function(obj) {
-    //     obj.isoDate = obj.ddate+'T'+obj.dep;
-    //     return obj;
-    //   }).sort(function(a, b) {
-    //     var timea = new Date(a.isoDate).getTime();
-    //     var timeb = new Date(b.isoDate).getTime();
-    //     return timea - timeb;
-    //   });
-    //   return graphData;
-    // }
-
     // function graphData(data) {
     //   // aggregate over time
     //    var interval = '15m';
@@ -294,13 +354,41 @@ module.exports = {
 
     // }
 
-    function drawChart() {
+
+
+
+
+
+    //   var interval = 15;
+    //   var current = data[0].ddate + ' 00:' + interval + ':00';
+    //   //divisions are days * 24*60/interval
+    //   var limit = form.days * 24 * (60/interval);
+    //   for (var i = 0; i < limit; i++) { // each time
+    //     while (data.isoDate <= current) {
+
+    //     }
+    //     limit   }
+
+
+    function drawChart(data, formvals) {
+      var xvals = [],
+          yvals0 = [],
+          yvals1 = [];
+
+      data.forEach(function(obj) {
+        // console.log('data from drawChart? ', obj);
+        //xvals.push(Date.parse(obj.date.join('T')));
+        //if (obj.date[1] == formvals())
+        yvals0.push([Date.parse(obj.date.join('T')),obj.pax]);
+
+      });
       $('#main-chart').highcharts({
         chart: {
-          type: 'areaspline'
+          type: 'areaspline',
+          zoomType:'x'
         },
         title: {
-          text: 'Average fruit consumption during one week'
+          text: formvals.airport + ' Flight Arrivals and Departures'
         },
 
         legend: {
@@ -311,39 +399,24 @@ module.exports = {
           y: 100,
           floating: true,
           borderWidth: 1,
-          backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+          backgroundColor:
+          (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
         },
         xAxis: {
-          categories: [
-            'Monday',
-            'Tuesday',
-            'Wednesday',
-            'Thursday',
-            'Friday',
-            'Saturday',
-            'Sunday',
-            'Monday',
-            'Tuesday',
-            'Wednesday',
-            'Thursday',
-            'Friday',
-            'Saturday',
-            'Sunday'
-          ]//,
-          // plotBands: [{ // visualize the weekend
-          //   from: 4.5,
-          //   to: 6.5,
-          //   color: 'rgba(68, 170, 213, .2)'
-          // }]
+          //data: xvals,
+          type:'datetime'
+          //dateTimeLabelFormats: {
+                //day: '%e of %b'
+            //}
         },
         yAxis: {
           title: {
-            text: 'Fruit units'
+            text: 'Passengers'
           }
         },
         tooltip: {
           shared: true,
-          valueSuffix: ' units',
+          valueSuffix: ' passengers',
           crosshairs: {
             width: 2
           }
@@ -353,7 +426,7 @@ module.exports = {
         },
         plotOptions: {
           areaspline: {
-            fillOpacity: 0.2
+            //fillOpacity: 0.2
           },
           series: {
             marker: {
@@ -373,12 +446,20 @@ module.exports = {
         },
 
         series: [{
-          name: 'John',
-          data: [3, 4, 3, 5, 4, 10, 12, 1, 3, 4, 3, 3, 5, 4]
-        }, {
-          name: 'Jane',
-          data: [1, 3, 4, 3, 3, 5, 4, 3, 4, 3, 5, 4, 10, 12]
-        }]
+          name: 'Arrivals',
+          data: yvals0,
+          // [3, 4, 3, 5, 4, 10, 12, 1, 3, 4, 3, 3, 5, 4],
+          fillColor:'rgba(0,0,205,0.3)',
+          lineWidth:0,
+
+
+        }// }, {
+        //   name: 'Departures',
+        //   data: [1, 3, 4, 3, 3, 5, 4, 3, 4, 3, 5, 4, 10, 12],
+        //   fillColor:'rgba(0,128,0,0.3)',
+        //   lineWidth:0
+        // }]
+        ]
       });
     }
   }

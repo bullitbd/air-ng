@@ -4,32 +4,36 @@
 @import "includes/overrides.styl"
 
 bkgdcolor = #2481A3
+ctrcolor = #eee
 
 body
   background-color bkgdcolor
 
 #guide
   background-color #3a7
-  height 10px;
+  height 10px
 
 #chartbox
-  height: 463px
+  height 424px
+  padding-bottom: 15px
 
 #main-chart
   width 100%
   height 100%
-  background-color #ddd
-  border-radius 4px
+  background-color ctrcolor
+
+.highcharts-container
+  border-radius 6px
 
 .container
-  width 960px;
-  background-color #eee
+  width 960px
+  background-color ctrcolor
 
 .row-top
   padding-top 15px
 
 .row-bottom
-  padding-top 30px
+  padding-top 5px
 
 // [class="row"]
 //     border 1px dotted rgba(0, 0, 0, 0.5)

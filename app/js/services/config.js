@@ -33,8 +33,8 @@ module.exports = {
 
     startForm: {
       numDays: 1,
-      arrivals: false,
-      departures: true,
+      arrivals: true,
+      departures: false,
       airport: "LAX",
       domestic: true,
       international: true,

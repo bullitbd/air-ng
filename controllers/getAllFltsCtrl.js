@@ -30,29 +30,29 @@ module.exports = function(req, res) {
 
     // Stream results one row at a time
     query.on('row', function(row) {
-      row.isoDate = row.ddate+' '+row.dep;
+      // row.isoDate = row.ddate+' '+row.dep; // ***moved to db (and corrected)***
       results.push(row);
     });
 
     // close connection and return results
-    query.on('end', function() { // TODO sort out sorting!
+    query.on('end', function() {
       done();
 
-      //sort results on datetime
-      results.sort(function(a,b) {
-        var timea = (a.isoDate);
-        var timeb = (b.isoDate);
-        // console.log('a: '+timea + ' b: ' + timeb);
+      //sort results on datetime  // ***moved to db***
+      // results.sort(function(a,b) {
+      //   var timea = (a.isoDate);
+      //   var timeb = (b.isoDate);
+      //   // console.log('a: '+timea + ' b: ' + timeb);
 
-        if (timea > timeb) {
-          return 1;
-        } else if (timeb > timea) {
-          return -1;
-        } else {
-          return 0;
-        }
+      //   if (timea > timeb) {
+      //     return 1;
+      //   } else if (timeb > timea) {
+      //     return -1;
+      //   } else {
+      //     return 0;
+      //   }
 
-      });
+      // });
       return res.json(results);
     });
   });
