@@ -9,6 +9,8 @@ var icao = require('./services/icao.js');
 var dbdata = {};
 var $inputs = $('#controls').find("[id]");
 var moment = require('moment');
+var period = config.chart.period;
+var startDay = config.chart.startDay;
 //require('highcharts/modules/exporting')(Highcharts);
 //require('highcharts/themes/air.js')(Highcharts);
 
@@ -217,8 +219,8 @@ module.exports = {
 
 
       function makeSlots(data,controls,cb) { // important! these need to remain sorted! make 2 sets of slots for arrivals and departures populate
-        var period = 5, // minutes TODO add input control
-            intervals = controls.numDays   * 86400 / period / 60, //total # of slots
+        // var period = config.period, moved to globals // minutes TODO add input control
+        var intervals = controls.numDays   * 86400 / period / 60, //total # of slots
             slots = { arrSlots: [], depSlots: [] },
             start = moment(controls.startDate);
                             // console.log(intervals);
@@ -260,9 +262,9 @@ module.exports = {
 
       //*********************************************************************
 
+      makeSlots(data, form, makeChartData);
       makeTable(data, form);
       panelInfo(data, form);
-      makeSlots(data, form, makeChartData);
 
     } // fn exposeData
 
@@ -332,18 +334,19 @@ module.exports = {
         },
 
         legend: {
-          layout: 'vertical',
-          align: 'left',
-          verticalAlign: 'top',
-          x: 150,
-          y: 100,
-          floating: true,
-          borderWidth: 1,
-          backgroundColor:
-          (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+          enabled: false
+          // layout: 'vertical',
+          // align: 'left',
+          // verticalAlign: 'top',
+          // x: 150,
+          // y: 100,
+          // floating: true,
+          // borderWidth: 1,
+          // backgroundColor:
+          // (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
         },
         xAxis: {
-          //data: xvals,
+          title: '',
           type:'datetime'
           //dateTimeLabelFormats: {
                 //day: '%e of %b'
@@ -352,14 +355,26 @@ module.exports = {
         yAxis: {
           title: {
             text: 'Passengers'
-          }
+          },
+          // labels: {
+          //   formatter: function() {
+          //       return Math.abs(this.value);
+          //   }
+          // }
         },
         tooltip: {
           shared: true,
           valueSuffix: ' passengers',
           crosshairs: {
             width: 2
-          }
+          },
+          positioner: function () {
+                return { x: 80, y: 50 };
+          },
+          // formatter: function() {
+          //   return this.x + '<br/>' + this.series.name + ': ' + Math.abs(this.y);
+          // }
+
         },
         credits: {
           enabled: false
@@ -375,6 +390,11 @@ module.exports = {
                 hover: {
                   enabled: false
                 }
+              }
+            },
+            states: {
+              hover: {
+                lineWidthPlus: 0
               }
             }
           },
@@ -396,9 +416,18 @@ module.exports = {
         }, {
           name: 'Departures',
           data: s1, // [1, 3, 4, 3, 3, 5, 4, 3, 4, 3, 5, 4, 10, 12],
-          fillColor:'rgba(0,0,205,0.3)',
+          fillColor:'rgba(0,0,205,0.3',
           lineWidth:0
         }]
+      },function() {
+        $('#slotTime').val(period).change(function(event) {
+          period = this.val();
+          // TODO activate a function here, get period out of globals?
+        });
+        $('#dayStart').val(startDay).change(function(event) {
+          startDay = this.val();
+          // TODO activate a function here, get startDay out of globals?
+        });
       });
     }
   }

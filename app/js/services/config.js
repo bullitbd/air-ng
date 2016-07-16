@@ -34,12 +34,17 @@ module.exports = {
     startForm: {
       numDays: 1,
       arrivals: true,
-      departures: false,
+      departures: true,
       airport: "LAX",
       domestic: true,
       international: true,
       carrier: "",
       delay: 2
+    },
+
+    chart: {
+      period: 10,
+      startDay: '03:00'
     }
 
 };

@@ -16,6 +16,14 @@
 
       <section id="chartbox" class="col-md-10">
         <div id="main-chart"></div>
+        <div id="chart-footer">
+          <span id="chart-footer-left">
+            day starts at: <input type="text" id="dayStart" name="dayStart" onclick="this.select();">
+          </span>
+          <span id="chart-footer-right">
+            time interval: <input type="text" id="slotTime" name="slotTime" onclick="this.select();"> minutes
+          </span>
+        </div>
       </section>
 
       <form id="controls" class="col-md-2">
