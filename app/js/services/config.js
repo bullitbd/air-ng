@@ -44,7 +44,7 @@ module.exports = {
 
     chart: {
       period: 10,
-      startDay: '03:00'
+      startDay: '00:00'
     }
 
 };

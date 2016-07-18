@@ -15,12 +15,16 @@ var startDay = config.chart.startDay;
 //require('highcharts/themes/air.js')(Highcharts);
 
 
+
 //console.log($inputs);
 
 module.exports = {
 
   init: function() {
 
+    Array.prototype.rotate = function(n) {
+      return this.slice(n, this.length).concat(this.slice(0, n));
+    };
 
     initForm(triggerChange);
     drawChart();
@@ -92,9 +96,18 @@ module.exports = {
 
       $inputs.on('change', formChanged);
 
+      $('#carrier').selectpicker({
+        selectedTextFormat: 'count > 1',
+        header: 'close',
+        liveSearch: true,
+        noneSelectedText: 'none',
+        actionsBox: true
+      });
+
+      //$('.carrier').selectpicker('refresh');
+
+
       //  $('select').selectr();
-
-
       callback(); // cb triggerChanged
 
     } // function initForm end;
@@ -259,6 +272,24 @@ module.exports = {
         cb(slots, form); // drawChart()
       } // fn makeChartData
 
+      // capture slot period change:
+      $('#slotTime').bind('keypress, change', function(e) {
+        if (e.type === 'change' || e.keycode == 13) {
+          period = $(this).val();
+          $(this).blur();
+          makeSlots(data, form, makeChartData);
+        }
+      // TODO set period cookie
+      });
+
+      $('#dayStart').bind('keypress, change', function(e) {
+        if (e.type === 'change' || e.keycode == 13) {
+          startDay = $(this).val();
+          $(this).blur();
+          makeSlots(data, form, makeChartData); //
+        }
+      // TODO set period cookie, combine functions;
+      });
 
       //*********************************************************************
 
@@ -420,14 +451,8 @@ module.exports = {
           lineWidth:0
         }]
       },function() {
-        $('#slotTime').val(period).change(function(event) {
-          period = this.val();
-          // TODO activate a function here, get period out of globals?
-        });
-        $('#dayStart').val(startDay).change(function(event) {
-          startDay = this.val();
-          // TODO activate a function here, get startDay out of globals?
-        });
+        $('#slotTime').val(period); // TODO make these persistent
+        $('#dayStart').val(startDay);
       });
     }
   }

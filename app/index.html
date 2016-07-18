@@ -18,7 +18,7 @@
         <div id="main-chart"></div>
         <div id="chart-footer">
           <span id="chart-footer-left">
-            day starts at: <input type="text" id="dayStart" name="dayStart" onclick="this.select();">
+            day starts at: <input type="text" pattern="^([01]\d|2[0-3]):?([0-5]\d)$" id="dayStart" name="dayStart" onclick="this.select();">
           </span>
           <span id="chart-footer-right">
             time interval: <input type="text" id="slotTime" name="slotTime" onclick="this.select();"> minutes

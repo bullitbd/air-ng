@@ -1,6 +1,7 @@
 'use strict';
 
-require('selectr');
+//require('selectr');
+require('bootstrap-select');
 var $ = require('jquery');
 window.jQuery = $;
 window.$ = $;

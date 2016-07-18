@@ -1,6 +1,9 @@
 /**** bootstrap ****/
 
 /* remove padding from cols inside row */
+
+csize = 30px
+
 .col-left
   padding-right 5px
 
@@ -22,6 +25,20 @@
   margin-bottom 2px
 
 .dropdown-menu
+  position relative
+  top 0
+  float right
+  font-size 12px
+  // max-width 160%
+  // min-width 100%
+  width: 200px;
+
+.form-group
+  margin-bottom 12px
+
+.form-control, .btn, .btn-group
+  font-size 12px
+  height csize
 
 .panel-default
   border-radius 6px
@@ -30,8 +47,21 @@
   border-top-left-radius 6px
   border-top-right-radius 6px
 
+.popover-title
+    padding 2px 14px
 
-/**** datapicker ****/
+select[multiple]
+  height csize
+
+/**** bootstrap select ****/
+
+.bs-actionsbox, .bs-donebutton, .bs-searchbox
+  font-size 12px
+  line-height 1em
+  height csize
+
+
+/**** datepicker ****/
 
 .datepicker //bootstrap-datepicker.css
   padding-left 8px
