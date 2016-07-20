@@ -9,12 +9,6 @@ ctrcolor = #eee
 body
   background-color bkgdcolor
 
-#flightTable tr
-  font-size 0.95em
-
-#flightTable td
-  padding 5px
-
 #guide
   background-color #3a7
   height 10px
@@ -95,15 +89,29 @@ body
 .fc-sm
   height 30px
 
+#flightTable tr
+  font-size 0.95em
+
+#flightTable td
+  padding 5px
+
 .tablediv
-  height 300px
+  height 275px
   overflow-x hidden
   overflow-y scroll
 
-.tablehead
+#tablehead
   color #333
   background-color #f5f5f5
   border-color #ddd
+  //font-weight bold
+  font-style italic
+
+#tablehead td
+  padding 5px
+
+#tablehead td>div
+  text-align left
 
 #loader
   background-color rgba(0,0,0,0.8)
