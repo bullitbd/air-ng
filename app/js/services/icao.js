@@ -416,19 +416,19 @@ module.exports = {
   airports: [
     {
       id: 'SEA',
-      name: 'Seattle International'
+      name: 'Seattle'
     }, {
       id: 'LAX',
-      name: 'Los Angeles International'
+      name: 'Los Angeles'
     }, {
       id: 'YVR',
-      name: 'Vancouver International'
+      name: 'Vancouver'
     }, {
       id: 'SFO',
-      name: 'San Francisco International'
+      name: 'San Francisco'
     }, {
       id: 'PDX',
-      name: 'Portland International'
+      name: 'Portland'
     }
   ],
 
