@@ -19,8 +19,7 @@ var period = config.chart.period;
 var startDay = config.chart.startDay;
 require('./lib/bootstrap-datepicker.js');
 
-
-//require('highcharts/modules/exporting')(Highcharts);
+// TODO how link to highcharts themes?
 //require('highcharts/themes/air.js')(Highcharts);
 
 
@@ -110,7 +109,8 @@ module.exports = function() {
       });
 
       //$('.carrier').selectpicker('refresh');
-      //  $('select').selectr();
+
+      // TODO //  $('select').selectr();
       callback(); // cb triggerChanged
 
     } // function initForm end;
@@ -168,16 +168,16 @@ module.exports = function() {
     // update Display called from $input.onChange and getFlightData as cb; provides filter with modelChange() for displayed data (calls exposeData);
 
     function updateDisplayData(form) {
-      console.log('form from updateDisplayData: ', form);
+      // console.log('form from updateDisplayData: ', form);
       var currData = dbdata.filter(modelChanged(form));
-      console.log('filtered from updateDisplayData: ', currData.length);
+      // console.log('filtered from updateDisplayData: ', currData.length);
       exposeData(currData, form);
     }
 
     //***********************************************************************
 
     function modelChanged(form) { //filter fn for dbdata.filter
-      console.log('form from modelChanged: ', form);
+      // console.log('form from modelChanged: ', form);
       var criteria;
       return function(obj) { // obj is 'each' of dbdata.filter
         //choose arrivals/departures/both
@@ -246,7 +246,7 @@ module.exports = function() {
             slots[prop].push({ date: date.split(' '), pax: 0, flights: [] });
           }
         }
-        console.log('slots array: ', slots);
+        // console.log('slots array: ', slots);
         cb(data, slots, controls, drawChart); // cb = makeChartData
       } // fn makeSlots
 
@@ -337,7 +337,7 @@ module.exports = function() {
 
       content += '</tbody>';
       titles += '</tr></tbody>';
-      console.log('celldata: ',celldata);
+      // console.log('celldata: ',celldata);
       if (celldata.length > 0) {
         $('#tablehead').html(titles);
       } else {
@@ -349,33 +349,24 @@ module.exports = function() {
         return $(this).width();
       });
 
-      console.log('tablearr: ', tablearr);
+      // console.log('tablearr: ', tablearr);
 
       $('#tablehead td>div').each(function(i) {
         $(this).css('width', tablearr[i]);
       });
-      //console.log($('#flightTable td')[3].innerWidth());
 
     }
 
     function drawChart(slots, formvals) { // cb from makeChartData
-      var xvals = [],
-        y0 = slots.arrSlots, // TODO non-fatal error here...
-        y1 = slots.depSlots,
-        s0 = [], // TODO check if empty array ok here...
-        s1 = [];
 
       // TODO add drilldown to flight info;
-      // TODO combine below into single function
-
-      y0.forEach(function(obj) {
-        s0.push([Date.parse(obj.date.join('T')), obj.pax]);
-      });
-
-      y1.forEach(function(obj) {
-        s1.push([Date.parse(obj.date.join('T')), obj.pax]);
-      });
-
+      // build chart data series:
+      var s = {};
+      for(var i = 0, keys = Object.keys(slots); i < keys.length; i++) {
+        s[keys[i] + 'Data'] = slots[keys[i]].map(function(obj) {
+          return [Date.parse(obj.date.join('T')), obj.pax];
+        });
+      }
 
       $('#main-chart').highcharts({
         chart: {
@@ -448,14 +439,14 @@ module.exports = function() {
 
         series: [{
           name: 'Arrivals',
-          data: s0,
+          data: s.arrSlotsData,
           fillColor: 'rgba(0,128,0,0.3)',
           lineWidth: 0
 
 
         }, {
           name: 'Departures',
-          data: s1,
+          data: s.depSlotsData,
           fillColor: 'rgba(0,0,205,0.3',
           lineWidth: 0
         }]
