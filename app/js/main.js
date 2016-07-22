@@ -32,7 +32,6 @@ module.exports = function() {
     };
 
     initForm(triggerChange);
-    drawChart();
 
     //***********************************************************************
 
@@ -401,7 +400,7 @@ module.exports = function() {
             width: 2
           },
           positioner: function() {
-            return { x: 80, y: 20 };
+            return { x: 60, y: 30 };
           },
           // formatter: function() {
           //   return this.x + '<br/>' + this.series.name + ': ' + Math.abs(this.y);
