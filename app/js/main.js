@@ -10,7 +10,7 @@
 var Highcharts = require('highcharts');
 var helpers = require('./services/helpers.js');
 var config = require('./services/config.js');
-var df = config.startForm;
+
 var icao = require('./services/icao.js');
 var dbdata = {};
 var $inputs = $('#controls').find("[id]");
@@ -25,7 +25,7 @@ require('./lib/bootstrap-datepicker.js');
 
 module.exports = function() {
 
-  //main: function() {
+    //main: function() {
 
     Array.prototype.rotate = function(n) {
       return this.slice(n, this.length).concat(this.slice(0, n));
@@ -53,7 +53,7 @@ module.exports = function() {
       });
       airport.val(config.defAirport);
 
-      // load delay select
+      // load delay select // TODO build this
       var delays = config.delays;
       var delay = $('select[name=delay]');
       $.each(delays, function(i, obj) {
@@ -76,7 +76,7 @@ module.exports = function() {
       // $('#startDate').datepicker('setValue', new Date()); // use with original version
 
       //init other controls
-
+      var df = config.startForm;
       $('#numDays').val(df.numDays);
       $('#airport').val(df.airport);
       $('#arrivals').prop('checked', df.arrivals);
@@ -88,14 +88,14 @@ module.exports = function() {
 
       // inputs onChange handler
 
-      var formChanged = function(e) {
+      function formChanged(e) {
         var formVals = getFormData($inputs);
         if (["startDate", "numDays", "airport"].indexOf(e.target.name) > -1) {
           getFlightData(formVals, updateDisplayData);
         } else {
           updateDisplayData(formVals);
         }
-      };
+      }
 
       $inputs.on('change', formChanged);
 
@@ -122,6 +122,7 @@ module.exports = function() {
 
     //get form data and then GET flight data based on those choices;
     //called from / returned to $inputs.onChange handler;
+
     function getFormData(controls) {
       var key, val;
       var formVals = {};
@@ -143,8 +144,9 @@ module.exports = function() {
         d: model.numDays,
         a: model.airport
       };
-      var url = 'http://localhost:3000/flights/all';
-
+      //var url = (config.server || 'http://localhost:3000') + '/flights/all';
+      var url = (config.server || 'http://localhost:3000') + '/flights/all';
+console.log('url: ', url);
       $.ajax({
         url: url,
         data: q,
@@ -199,7 +201,7 @@ module.exports = function() {
 
     function exposeData(data, form) {
 
-      function panelInfo(data, format) { // info in panel header
+      function panelInfo(data) { // info in panel header
         var counta = 0,
           countd = 0;
         $.each(data, function(i, obj) {
@@ -271,7 +273,7 @@ module.exports = function() {
             }
           }
         });
-        cb(slots, form); // drawChart()
+        cb(slots, form, period, startDay); // drawChart()
       } // fn makeChartData
 
       // capture slot period change:
@@ -356,103 +358,23 @@ module.exports = function() {
 
     }
 
-    function drawChart(slots, formvals) { // cb from makeChartData
+    var drawChart = require('./controllers/chart.js');
+    // function drawChart(slots, formvals) { // cb from makeChartData
 
-      // TODO add drilldown to flight info;
-      // build chart data series:
-      var s = {};
-      for(var i = 0, keys = Object.keys(slots); i < keys.length; i++) {
-        s[keys[i] + 'Data'] = slots[keys[i]].map(function(obj) {
-          return [Date.parse(obj.date.join('T')), obj.pax];
-        });
-      }
+    //   // TODO add drilldown to flight info;
+    //   // build chart data series:
+    //   var s = {};
+    //   for(var i = 0, keys = Object.keys(slots); i < keys.length; i++) {
+    //     s[keys[i] + 'Data'] = slots[keys[i]].map(function(obj) {
+    //       return [Date.parse(obj.date.join('T')), obj.pax];
+    //     });
+    //   }
+    //   var options = require('./services/hc_options.js')(formvals, s);
 
-      $('#main-chart').highcharts({
-        chart: {
-          type: 'areaspline',
-          zoomType: 'x'
-        },
-        title: {
-          text: formvals.airport + ' Flight Arrivals and Departures'
-        },
-
-        legend: {
-          enabled: false
-        },
-
-        xAxis: {
-          title: '',
-          type: 'datetime',
-            dateTimeLabelFormats: {
-              //day: '%e of %b'
-            }
-        },
-        yAxis: {
-          title: {
-            text: 'Passengers'
-          },
-
-        },
-        tooltip: {
-          shared: true,
-          valueSuffix: ' passengers',
-          crosshairs: {
-            width: 2
-          },
-          positioner: function() {
-            return { x: 60, y: 30 };
-          },
-          // formatter: function() {
-          //   return this.x + '<br/>' + this.series.name + ': ' + Math.abs(this.y);
-          // }
-
-        },
-        credits: {
-          enabled: false
-        },
-        plotOptions: {
-          areaspline: {
-            //fillOpacity: 0.2
-          },
-          series: {
-            marker: {
-              enabled: false,
-              states: {
-                hover: {
-                  enabled: false
-                }
-              }
-            },
-            states: {
-              hover: {
-                lineWidthPlus: 0
-              }
-            }
-          },
-          line: {
-            marker: {
-              enabled: false
-            }
-          }
-        },
-
-        series: [{
-          name: 'Arrivals',
-          data: s.arrSlotsData,
-          fillColor: 'rgba(0,128,0,0.3)',
-          lineWidth: 0
-
-
-        }, {
-          name: 'Departures',
-          data: s.depSlotsData,
-          fillColor: 'rgba(0,0,205,0.3',
-          lineWidth: 0
-        }]
-      }, function() {
-        $('#slotTime').val(period); // TODO make these persistent
-        $('#dayStart').val(startDay);
-      });
-    }
+    //   $('#main-chart').highcharts(options, function() {
+    //     $('#slotTime').val(period); // TODO make these persistent
+    //     $('#dayStart').val(startDay);
+    //   });
+    // }
 
 };

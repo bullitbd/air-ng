@@ -3,7 +3,6 @@
 var pg = require('pg');
 var db = require('../config.js').db; //TODO split this out server/client
 var moment = require('moment');
-
 module.exports = function(req, res) {
 
   var start = req.query.q;

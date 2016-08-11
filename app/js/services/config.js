@@ -2,6 +2,8 @@
 
 module.exports = {
 
+    //server: 'http://52.41.213.81:3000',
+
     delays: [
       [0, "0"],
       [0.5, "1/2"],
