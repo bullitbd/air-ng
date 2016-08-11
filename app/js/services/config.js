@@ -45,7 +45,7 @@ module.exports = {
     },
 
     chart: {
-      period: 10,
+      period: 15,
       startDay: '00:00'
     }
 

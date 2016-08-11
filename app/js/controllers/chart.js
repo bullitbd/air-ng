@@ -111,7 +111,7 @@ module.exports = function(slots, formvals, period, startDay) {
     }, {
       name: 'Departures',
       data: s.depSlotsData,
-      fillColor: 'rgba(0,0,205,0.3',
+      fillColor: 'rgba(0,0,205,0.3)',
       lineWidth: 0
     }]
   };
