@@ -1,7 +1,7 @@
 'use strict';
 /*jshint -W083 */
-module.exports = function(slots, formvals, period, startDay) {
-  console.log('chart: ', slots, formvals, period, startDay);
+module.exports = function(slots, formvals, period, startDay, cb) {
+  console.log('chart: ', slots, formvals);
 
   // TODO add drilldown to flight info;
   // build chart data series:
@@ -11,8 +11,14 @@ module.exports = function(slots, formvals, period, startDay) {
       return [Date.parse(obj.date.join('T')), obj.pax];
     });
   }
+  var selected = []; // filled in afterSetExtremes below;
 
-    var options = {
+  var count = slots.arrSlots.length;
+  for (var j = 0; j < count; j++) {
+    selected.push(j);
+  }
+  cb(selected);
+  var options = {
     chart: {
       type: 'areaspline',
       zoomType: 'x'
@@ -39,14 +45,14 @@ module.exports = function(slots, formvals, period, startDay) {
         afterSetExtremes: function() {
 
           var series = this.series[1],
-              points = series.points,
+              points = series.points;
               selected = [];
           for (var i = 0; i < points.length; i++) {
             if (points[i].isInside) {
               selected.push(points[i].index);
             }
           }
-          console.log(selected);
+          cb(selected);
         }
       }
 
@@ -116,9 +122,6 @@ module.exports = function(slots, formvals, period, startDay) {
     }]
   };
 
-  $('#main-chart').highcharts(options, function() {
-    $('#slotTime').val(period); // TODO make these persistent
-    $('#dayStart').val(startDay);
-  });
+  $('#main-chart').highcharts(options);
 
 }; // exports

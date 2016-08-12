@@ -240,7 +240,7 @@ console.log('url: ', url);
         var intervals = controls.numDays * 86400 / period / 60, //total # of slots
           slots = { arrSlots: [], depSlots: [] },
           start = moment(controls.startDate);
-        // console.log(intervals);
+        console.log('intervals: ', intervals);
         for (var i = 0; i < intervals; i++) {
           var date = moment(start).add((i + 1) * period, 'minutes').format('YYYY-MM-DD HH:mm:ss');
           for (var prop in slots) {
@@ -250,7 +250,6 @@ console.log('url: ', url);
         // console.log('slots array: ', slots);
         cb(data, slots, controls, drawChart); // cb = makeChartData
       } // fn makeSlots
-
 
       function makeChartData(data, slots, form, cb) { // cb = drawChart
         data.forEach(function(row) {
@@ -273,8 +272,14 @@ console.log('url: ', url);
             }
           }
         });
-        cb(slots, form, period, startDay); // drawChart()
+
+        cb(slots, form, period, startDay, returnChartData); // drawChart()
+
       } // fn makeChartData
+
+      function returnChartData(data) {
+          console.log('chart data: ', data);
+      }
 
       // capture slot period change:
       $('#slotTime').bind('keypress, change', function(e) {
@@ -359,6 +364,7 @@ console.log('url: ', url);
     }
 
     var drawChart = require('./controllers/chart.js');
+
     // function drawChart(slots, formvals) { // cb from makeChartData
 
     //   // TODO add drilldown to flight info;
