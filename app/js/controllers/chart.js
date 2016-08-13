@@ -1,7 +1,7 @@
 'use strict';
 /*jshint -W083 */
-module.exports = function(slots, formvals, period, startDay, cb) {
-  console.log('chart: ', slots, formvals);
+module.exports = function(slots, formvals, cb) {
+  // console.log('chart: ', slots, formvals);
 
   // TODO add drilldown to flight info;
   // build chart data series:
@@ -17,7 +17,7 @@ module.exports = function(slots, formvals, period, startDay, cb) {
   for (var j = 0; j < count; j++) {
     selected.push(j);
   }
-  cb(selected);
+  cb(slots, selected); // send initial chart points
   var options = {
     chart: {
       type: 'areaspline',
@@ -52,7 +52,7 @@ module.exports = function(slots, formvals, period, startDay, cb) {
               selected.push(points[i].index);
             }
           }
-          cb(selected);
+          cb(slots, selected); // cb is main.makeChartData.drawChart.returnChartData
         }
       }
 

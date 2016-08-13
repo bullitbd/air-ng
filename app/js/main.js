@@ -22,14 +22,15 @@ require('./lib/bootstrap-datepicker.js');
 // TODO how link to highcharts themes?
 //require('highcharts/themes/air.js')(Highcharts);
 
+var t0, t1; //debug
 
 module.exports = function() {
 
     //main: function() {
 
-    Array.prototype.rotate = function(n) {
-      return this.slice(n, this.length).concat(this.slice(0, n));
-    };
+    // Array.prototype.rotate = function(n) {
+    //   return this.slice(n, this.length).concat(this.slice(0, n));
+    // };
 
     initForm(triggerChange);
 
@@ -106,7 +107,7 @@ module.exports = function() {
         noneSelectedText: 'none',
         actionsBox: true
       });
-
+console.log('end init'); //debug
       //$('.carrier').selectpicker('refresh');
 
       // TODO //  $('select').selectr();
@@ -116,14 +117,14 @@ module.exports = function() {
 
     //***********************************************************************
 
-    function triggerChange() { // setup initial state
+    function triggerChange() { // setup initial state called from initForm()
       $('#numDays').triggerHandler('change'); // fire $inputs.on('change', formChanged);
     }
 
     //get form data and then GET flight data based on those choices;
     //called from / returned to $inputs.onChange handler;
 
-    function getFormData(controls) {
+    function getFormData(controls) { // called from function formChanged(e) =>getFormData($inputs)
       var key, val;
       var formVals = {};
       controls.each(function() {
@@ -131,6 +132,7 @@ module.exports = function() {
         val = ($(this).prop("type") == "checkbox") ? $(this).is(':checked') : $(this).val();
         formVals[key] = val;
       });
+      console.log('form queried'); //debug
       return formVals;
     }
 
@@ -138,6 +140,7 @@ module.exports = function() {
 
     // flight data ajax call to server api - uses server route to postgres function;
     function getFlightData(model, callback) { //called from init and $input.onChange
+              var t0 = performance.now(); //debug
 
       var q = { // query string
         q: model.startDate,
@@ -146,7 +149,7 @@ module.exports = function() {
       };
       //var url = (config.server || 'http://localhost:3000') + '/flights/all';
       var url = (config.server || 'http://localhost:3000') + '/flights/all';
-console.log('url: ', url);
+          // console.log('url: ', url);
       $.ajax({
         url: url,
         data: q,
@@ -155,13 +158,18 @@ console.log('url: ', url);
         success: function(result) {
 
           dbdata = result; // store result for continued use;
+          console.log('data success'); //debug
+          var t1 = performance.now(); //debug
+      console.log('getFlightData took ' + (t1-t0) + 'ms');
           callback(model); // cb updateDisplayData
+
         },
 
         error: function(request, status, error) {
-          console.log('ERROR:', request.body, status, request.status, request.responseText);
+          // console.log('ERROR:', request.body, status, request.status, request.responseText);
         }
       });
+
     } // fn getFlightData
 
     //***********************************************************************
@@ -172,6 +180,7 @@ console.log('url: ', url);
       // console.log('form from updateDisplayData: ', form);
       var currData = dbdata.filter(modelChanged(form));
       // console.log('filtered from updateDisplayData: ', currData.length);
+      console.log('display updated'); //debug
       exposeData(currData, form);
     }
 
@@ -199,7 +208,7 @@ console.log('url: ', url);
 
     //***********************************************************************
 
-    function exposeData(data, form) {
+    function exposeData(data, form) { //currData from updateDisplayData <= dbdata.filter(modelChanged(form))
 
       function panelInfo(data) { // info in panel header
         var counta = 0,
@@ -235,12 +244,14 @@ console.log('url: ', url);
       // ****************** CHART FUNCTIONS ***********************
 
 
+
       function makeSlots(data, controls, cb) { // important! these need to remain sorted! make 2 sets of slots for arrivals and departures populate
         // var period = config.period, moved to globals // minutes TODO add input control
+        var t0 = performance.now(); //debug
         var intervals = controls.numDays * 86400 / period / 60, //total # of slots
           slots = { arrSlots: [], depSlots: [] },
           start = moment(controls.startDate);
-        console.log('intervals: ', intervals);
+        // console.log('intervals: ', intervals);
         for (var i = 0; i < intervals; i++) {
           var date = moment(start).add((i + 1) * period, 'minutes').format('YYYY-MM-DD HH:mm:ss');
           for (var prop in slots) {
@@ -248,12 +259,27 @@ console.log('url: ', url);
           }
         }
         // console.log('slots array: ', slots);
+                    var t1 = performance.now(); //debug
+
         cb(data, slots, controls, drawChart); // cb = makeChartData
+      console.log('makeSlots took ' + (t1-t0) + 'ms');
+
       } // fn makeSlots
 
+
+      function getSlot(slots, obj) { // if obj date <= slot date return row push
+            // console.log('getSlot obj? ',obj);
+        for (var i = 0; i < slots.arrSlots.length; i++) {
+          if (obj.isodate <= slots.arrSlots[i].date.join(' ')) {
+            return i;
+          }
+        }
+      }
+
       function makeChartData(data, slots, form, cb) { // cb = drawChart
+              var t0 = performance.now(); //debug
         data.forEach(function(row) {
-          var j = getSlot(row);
+          var j = getSlot(slots, row);
           // split into separate series
           if (row.dest == form.airport) {
             slots.arrSlots[j].flights.push(row);
@@ -263,23 +289,38 @@ console.log('url: ', url);
             slots.depSlots[j].pax += row.seats;
           }
 
-          function getSlot(obj) { // if obj date <= slot date return row push
-            // console.log('getSlot obj? ',obj);
-            for (var i = 0; i < slots.arrSlots.length; i++) {
-              if (obj.isodate <= slots.arrSlots[i].date.join(' ')) {
-                return i;
-              }
-            }
-          }
         });
-
-        cb(slots, form, period, startDay, returnChartData); // drawChart()
+              var t1 = performance.now(); //debug
+              console.log('makeChartData took ' + (t1-t0) + 'ms');
+        cb(slots, form, returnChartData); // drawChart()
+        t1 = performance.now();
+                      console.log('makeChartData with draw took ' + (t1-t0) + 'ms');
 
       } // fn makeChartData
 
-      function returnChartData(data) {
-          console.log('chart data: ', data);
+      function returnChartData(slots, points) { // return visible data points in chart
+              var t0 = performance.now(); //debug
+
+        var flights = [];
+        points.forEach(function(point, i) {
+          flights.push(slots.arrSlots[point].flights);
+          flights.push(slots.depSlots[point].flights);
+        });
+        flights = flights.reduce(function(a,b) {
+          return a.concat(b);
+        },[]);//.sort(function(a,b) {
+        //   return moment(a.isodate) - moment(b.isodate);
+        // });
+          // console.log('chart data: ', points);
+          console.log('flights? ', flights.length);
+          makeTable(flights, form);
+          panelInfo(flights, form);
+          $('#slotTime').val(period); // TODO make these persistent
+          $('#dayStart').val(startDay);
+            var t1 = performance.now(); //debug
+      console.log('returnChartData took ' + (t1-t0) + 'ms');
       }
+
 
       // capture slot period change:
       $('#slotTime').bind('keypress, change', function(e) {
@@ -303,16 +344,16 @@ console.log('url: ', url);
       //*********************************************************************
 
       makeSlots(data, form, makeChartData);
-      makeTable(data, form);
-      panelInfo(data, form);
-
+      // makeTable(data, form);
+      // panelInfo(data, form);
+console.log('data exposed'); //debug
     } // fn exposeData
 
     //***********************************************************************
 
     //create table using filtered data from updateDisplayData via exposeData
 
-    function makeTable(celldata, formvals) { //build table to display charted records
+    function makeTable(flightdata, formvals) { //build table to display charted records
       var tmap = config.tableMap;
       var content = '<tbody>';
       var titles = '<tbody><tr>';
@@ -324,12 +365,15 @@ console.log('url: ', url);
 
          titles += '<td><div>' + colhead[0].title + '</div></td>';
       }
-      $.each(celldata, function(index, val) {
 
+  console.log('flightdata ', flightdata.length);
+      $.each(flightdata, function(index, val) {
+
+        content += '<tr data-id=' + val.id;
         if (val.dest == formvals.airport) {
-          content += '<tr style="color:#008000">';
+          content += ' class="arr-color">';
         } else {
-          content += '<tr style="color:#0000CD">';
+          content += ' class="dep-color">';
         }
 
         for (var i = 0; i < tmap.length; i++) {
@@ -343,23 +387,23 @@ console.log('url: ', url);
 
       content += '</tbody>';
       titles += '</tr></tbody>';
-      // console.log('celldata: ',celldata);
-      if (celldata.length > 0) {
+      if (flightdata.length > 0) {
         $('#tablehead').html(titles);
       } else {
         $('#tablehead').html('');
       }
       $('#flightTable').html(content);
 
+      // ***align th labels with column widths:***
       var tablearr = $('#flightTable tr:first-child td').map(function() {
         return $(this).width();
       });
 
-      // console.log('tablearr: ', tablearr);
-
       $('#tablehead td>div').each(function(i) {
         $(this).css('width', tablearr[i]);
       });
+
+      //****************************
 
     }
 

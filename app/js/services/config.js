@@ -29,7 +29,8 @@ module.exports = {
       {title: "a/c", data: "plane", pos: 10},
       //{title: "dow", data: "daynum", pos: 11}
       {title: "+/-", data: "next", pos: 11},
-      //{title: "range", data: "daterange", pos:12}
+      {title: "id", data: "id", pos: 12}
+
 
     ],
 
