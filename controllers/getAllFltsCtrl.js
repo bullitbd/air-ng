@@ -21,7 +21,7 @@ module.exports = function(req, res) {
     }
 
     var sql = {
-      text: 'SELECT * FROM allflts($1,$2,$3)',
+      text: 'SELECT * FROM allflts2($1,$2,$3)',
       values: [start, days, airport]
     };
 
