@@ -1,5 +1,8 @@
 'use strict';
+
 var moment = require('moment');
+
+// highcharts option object
 module.exports = function(formvals,s) {
   return {
 
